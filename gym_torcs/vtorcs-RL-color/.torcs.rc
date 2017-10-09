@@ -1,0 +1,2 @@
+TORCS_BASE = /home/ameya/MyPrograms/AI_project/project/gym_torcs/vtorcs-RL-color
+MAKE_DEFAULT = /home/ameya/MyPrograms/AI_project/project/gym_torcs/vtorcs-RL-color/Make-default.mk

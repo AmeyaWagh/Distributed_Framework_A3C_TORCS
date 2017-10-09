@@ -1,2 +1,2 @@
 *.pdf
-gym_torcs
+__pycache__/
