@@ -2,6 +2,7 @@
 from gym_torcs.gym_torcs import TorcsEnv
 from gameAgent import Agent
 import numpy as np
+import os
 
 vision = True
 episode_count = 10
@@ -46,6 +47,7 @@ for i in range(episode_count):
         print("")
     except KeyboardInterrupt:
         print ("process killed by user")
+        os.system('pkill torcs')
         quit()
 
 env.end()  # This is for shutting down TORCS
