@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+# import keras
+import time
 
 class Agent(object):
     def __init__(self, dim_action):
@@ -24,13 +26,28 @@ class Agent(object):
                 So you may need to remove.
             """
             print(vision.shape)
-            """
-            img = np.ndarray((64,64,3))
-            for i in range(3):
-                img[:, :, i] = 255 - vision[:, i].reshape((64, 64))
+            
+            # img = np.ndarray((64,64,3))
+            # for i in range(3):
+            #     img[:, :, i] = 255 - vision[:, i].reshape((64, 64))
 
-            plt.imshow(img, origin='lower')
-            plt.draw()
-            plt.pause(0.001)
-            """
-        return np.tanh(np.random.randn(self.dim_action)) # random action
+            # plt.imshow(img, origin='lower')
+            # plt.draw()
+            # plt.pause(0.001)
+
+            print ("speedX",speedX)
+            print ("speedY",speedY)
+            print ("speedZ",speedZ)
+            print ("focus",focus)
+            steerAngle = 0
+            if speedY<0:
+                steerAngle = 0.99
+            elif speedY>0:
+                steerAngle = -0.99
+            else:
+                steerAngle = 0.00
+            # time.sleep(0.1)
+            # steerAngle = np.tanh(np.random.randn(self.dim_action))
+            print("steerAngle:",steerAngle)
+        # return np.tanh(np.random.randn(self.dim_action)) # random action
+        return [steerAngle] # random action
