@@ -3,19 +3,20 @@ import matplotlib.pyplot as plt
 # import keras
 import time
 
+
 class Agent(object):
-    def __init__(self, dim_action,verbose=False):
+
+    def __init__(self, dim_action, verbose=False):
         self.dim_action = dim_action
         self.verbose = verbose
 
-    def debugger(self,*args,**kwargs):
+    def debugger(self, *args, **kwargs):
         # for arg in args:
         if self.verbose is True:
             print(args)
 
-
     def act(self, ob, reward, done, vision_on):
-        #print("ACT!")
+        # print("ACT!")
 
         # Get an Observation from the environment.
         # Each observation vectors are numpy array.
@@ -25,17 +26,18 @@ class Agent(object):
         # vision is given as a tensor with size of (64*64, 3) = (4096, 3) <-- rgb
         # and values are in [0, 255]
         if vision_on is False:
-            focus, speedX, speedY, speedZ, opponents, rpm, track, wheelSpinVel,angle = ob
+            focus, speedX, speedY, speedZ, opponents, rpm,\
+                track, wheelSpinVel, angle = ob
             # input_vector=[focus,speedX,speedY,speedZ,opponents,rpm,track,wheelSpinVel]
         else:
-            focus, speedX, speedY, speedZ, opponents, rpm, track, wheelSpinVel, vision = ob
+            focus, speedX, speedY, speedZ, opponents, rpm, \
+                track, wheelSpinVel, vision = ob
 
-            """ The code below is for checking the vision input. This is very heavy for real-time Control
+            """ The code below is for checking the vision input. 
+                This is very heavy for real-time Control
                 So you may need to remove.
             """
             print(vision.shape)
-            
-           
 
         # print ("speedX",speedX)
         # print ("speedY",speedY)
@@ -48,26 +50,22 @@ class Agent(object):
         # print ("rpm",rpm)
         # print ("wheelSpinVel",wheelSpinVel)
 
-        self.debugger("speedX",speedX)
-        self.debugger("speedY",speedY)
-        self.debugger("speedZ",speedZ)
+        self.debugger("speedX", speedX)
+        self.debugger("speedY", speedY)
+        self.debugger("speedZ", speedZ)
         # self.debugger("opponents",opponents)
-        self.debugger("focus",focus) # 5 range finder sensors
-        self.debugger("track",track) # 19 range finder sensors
+        self.debugger("focus", focus)  # 5 range finder sensors
+        self.debugger("track", track)  # 19 range finder sensors
 
-        self.debugger("angle",angle)
-        self.debugger("rpm",rpm)
-        self.debugger("wheelSpinVel",wheelSpinVel)
-        
-
-
+        self.debugger("angle", angle)
+        self.debugger("rpm", rpm)
+        self.debugger("wheelSpinVel", wheelSpinVel)
 
         # steerAngle = angle/3.14
-
 
         steerAngle = np.tanh(angle/3.14)
         # time.sleep(0.1)
         # steerAngle = np.tanh(np.random.randn(self.dim_action))
-        print("steerAngle:",steerAngle/3.14)
+        print("steerAngle:", steerAngle/3.14)
         # return np.tanh(np.random.randn(self.dim_action)) # random action
-        return [steerAngle] # random action
+        return [steerAngle]  # random action
