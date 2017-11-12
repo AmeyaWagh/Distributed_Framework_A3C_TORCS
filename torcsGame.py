@@ -3,18 +3,19 @@ from gym_torcs.gym_torcs import TorcsEnv
 from gameAgent import Agent
 import numpy as np
 import os
+import time
 
 vision = False
 episode_count = 10
-max_steps = 50
+max_steps = 5000
 reward = 0
 done = False
 step = 0
 
 # Generate a Torcs environment
-env = TorcsEnv(vision=vision, throttle=False ,textMode=False,xmlPath='./gym_torcs/practice.xml')
+env = TorcsEnv(vision=vision, throttle=False ,textMode=True,xmlPath='./gym_torcs/practice.xml')
 
-agent = Agent(1)  # steering only
+agent = Agent(1,verbose=False)  # steering only
 
 
 print("TORCS Experiment Start.")
@@ -40,11 +41,13 @@ for i in range(episode_count):
 
             step += 1
             if done:
+                print('-'*80,'\nDone\n','-'*80)
                 break
 
         print("TOTAL REWARD @ " + str(i) +" -th Episode  :  " + str(total_reward))
         print("Total Step: " + str(step))
         print("")
+        time.sleep(0.5)
     except KeyboardInterrupt:
         print ("process killed by user")
         os.system('pkill torcs')

@@ -4,8 +4,15 @@ import matplotlib.pyplot as plt
 import time
 
 class Agent(object):
-    def __init__(self, dim_action):
+    def __init__(self, dim_action,verbose=False):
         self.dim_action = dim_action
+        self.verbose = verbose
+
+    def debugger(self,*args,**kwargs):
+        # for arg in args:
+        if self.verbose is True:
+            print(args)
+
 
     def act(self, ob, reward, done, vision_on):
         #print("ACT!")
@@ -28,37 +35,39 @@ class Agent(object):
             """
             print(vision.shape)
             
-            # img = np.ndarray((64,64,3))
-            # for i in range(3):
-            #     img[:, :, i] = 255 - vision[:, i].reshape((64, 64))
+           
 
-            # plt.imshow(img, origin='lower')
-            # plt.draw()
-            # plt.pause(0.001)
+        # print ("speedX",speedX)
+        # print ("speedY",speedY)
+        # print ("speedZ",speedZ)
+        # # print ("opponents",opponents)
+        # print ("focus",focus) # 5 range finder sensors
+        # print ("track",track) # 19 range finder sensors
 
-        print ("speedX",speedX)
-        print ("speedY",speedY)
-        print ("speedZ",speedZ)
-        # print ("opponents",opponents)
-        print ("focus",focus) # 5 range finder sensors
-        print ("track",track) # 19 range finder sensors
+        # print ("angle",angle)
+        # print ("rpm",rpm)
+        # print ("wheelSpinVel",wheelSpinVel)
 
-        print ("angle",angle)
-        print ("rpm",rpm)
-        print ("wheelSpinVel",wheelSpinVel)
-        # print(input_vector)
+        self.debugger("speedX",speedX)
+        self.debugger("speedY",speedY)
+        self.debugger("speedZ",speedZ)
+        # self.debugger("opponents",opponents)
+        self.debugger("focus",focus) # 5 range finder sensors
+        self.debugger("track",track) # 19 range finder sensors
 
-        # steerAngle = 0
-        # if speedY<0:
-        #     steerAngle = 0.99
-        # elif speedY>0:
-        #     steerAngle = -0.99
-        # else:
-        #     steerAngle = 0.00
+        self.debugger("angle",angle)
+        self.debugger("rpm",rpm)
+        self.debugger("wheelSpinVel",wheelSpinVel)
+        
 
-        steerAngle = angle/3.14
+
+
+        # steerAngle = angle/3.14
+
+
+        steerAngle = np.tanh(angle/3.14)
         # time.sleep(0.1)
         # steerAngle = np.tanh(np.random.randn(self.dim_action))
-        print("steerAngle:",steerAngle)
+        print("steerAngle:",steerAngle/3.14)
         # return np.tanh(np.random.randn(self.dim_action)) # random action
         return [steerAngle] # random action

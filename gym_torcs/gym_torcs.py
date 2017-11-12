@@ -34,13 +34,17 @@ class TorcsEnv:
         if self.vision is True:
             if self.textMode is True:
                 print('textMode')
-                os.system('torcs -nofuel -nodamage -nolaptime  -vision -r {} &'.Format(self.xmlPath))
+                textModestr = 'torcs -nofuel -nodamage -nolaptime  -vision -r {} &'.format(self.xmlPath)
+                print(textModestr)
+                os.system(textModestr)
             else:
                 os.system('torcs -nofuel -nodamage -nolaptime  -vision &')
         else:
             if self.textMode is True:
                 print('textMode')
-                os.system('torcs  -nofuel -nodamage -nolaptime -r {} &'.Format(self.xmlPath))
+                textModestr = 'torcs -nofuel -nodamage -nolaptime -r {} &'.format(self.xmlPath)
+                print(textModestr)
+                os.system(textModestr)
             else:
                 os.system('torcs  -nofuel -nodamage -nolaptime &')
         time.sleep(0.5)
