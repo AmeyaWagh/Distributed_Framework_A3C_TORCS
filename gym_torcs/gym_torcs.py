@@ -18,21 +18,31 @@ class TorcsEnv:
     initial_reset = True
 
 
-    def __init__(self, vision=False, throttle=False, gear_change=False):
+    def __init__(self, vision=False, throttle=False, gear_change=False,textMode=False,xmlPath='practice.xml'):
        #print("Init")
         self.vision = vision
         self.throttle = throttle
         self.gear_change = gear_change
 
         self.initial_run = True
+        self.textMode = textMode
+        self.xmlPath = xmlPath
 
         ##print("launch torcs")
         os.system('pkill torcs')
         time.sleep(0.5)
         if self.vision is True:
-            os.system('torcs -nofuel -nodamage -nolaptime  -vision &')
+            if self.textMode is True:
+                print('textMode')
+                os.system('torcs -nofuel -nodamage -nolaptime  -vision -r {} &'.Format(self.xmlPath))
+            else:
+                os.system('torcs -nofuel -nodamage -nolaptime  -vision &')
         else:
-            os.system('torcs  -nofuel -nodamage -nolaptime &')
+            if self.textMode is True:
+                print('textMode')
+                os.system('torcs  -nofuel -nodamage -nolaptime -r {} &'.Format(self.xmlPath))
+            else:
+                os.system('torcs  -nofuel -nodamage -nolaptime &')
         time.sleep(0.5)
         os.system('sh gym_torcs/autostart.sh')
         time.sleep(0.5)
@@ -246,7 +256,8 @@ class TorcsEnv:
                      'opponents',
                      'rpm',
                      'track',
-                     'wheelSpinVel']
+                     'wheelSpinVel',
+                     'angle']
             Observation = col.namedtuple('Observaion', names)
             return Observation(focus=np.array(raw_obs['focus'], dtype=np.float32)/200.,
                                speedX=np.array(raw_obs['speedX'], dtype=np.float32)/self.default_speed,
@@ -255,7 +266,8 @@ class TorcsEnv:
                                opponents=np.array(raw_obs['opponents'], dtype=np.float32)/200.,
                                rpm=np.array(raw_obs['rpm'], dtype=np.float32),
                                track=np.array(raw_obs['track'], dtype=np.float32)/200.,
-                               wheelSpinVel=np.array(raw_obs['wheelSpinVel'], dtype=np.float32))
+                               wheelSpinVel=np.array(raw_obs['wheelSpinVel'], dtype=np.float32),
+                               angle=np.array(raw_obs['angle'], dtype=np.float32),)
         else:
             names = ['focus',
                      'speedX', 'speedY', 'speedZ',

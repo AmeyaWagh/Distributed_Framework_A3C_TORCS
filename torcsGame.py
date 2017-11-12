@@ -12,7 +12,7 @@ done = False
 step = 0
 
 # Generate a Torcs environment
-env = TorcsEnv(vision=vision, throttle=False)
+env = TorcsEnv(vision=vision, throttle=False ,textMode=False,xmlPath='./gym_torcs/practice.xml')
 
 agent = Agent(1)  # steering only
 
