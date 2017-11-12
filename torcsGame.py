@@ -4,7 +4,7 @@ from gameAgent import Agent
 import numpy as np
 import os
 
-vision = True
+vision = False
 episode_count = 10
 max_steps = 50
 reward = 0

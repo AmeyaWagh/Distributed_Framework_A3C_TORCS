@@ -19,6 +19,7 @@ class Agent(object):
         # and values are in [0, 255]
         if vision_on is False:
             focus, speedX, speedY, speedZ, opponents, rpm, track, wheelSpinVel = ob
+            input_vector=[focus,speedX,speedY,speedZ,opponents,rpm,track,wheelSpinVel]
         else:
             focus, speedX, speedY, speedZ, opponents, rpm, track, wheelSpinVel, vision = ob
 
@@ -35,19 +36,20 @@ class Agent(object):
             # plt.draw()
             # plt.pause(0.001)
 
-            print ("speedX",speedX)
-            print ("speedY",speedY)
-            print ("speedZ",speedZ)
-            print ("focus",focus)
-            steerAngle = 0
-            if speedY<0:
-                steerAngle = 0.99
-            elif speedY>0:
-                steerAngle = -0.99
-            else:
-                steerAngle = 0.00
-            # time.sleep(0.1)
-            # steerAngle = np.tanh(np.random.randn(self.dim_action))
+        # print ("speedX",speedX)
+        # print ("speedY",speedY)
+        # print ("speedZ",speedZ)
+        # print ("focus",focus)
+        print(input_vector)
+        steerAngle = 0
+        if speedY<0:
+            steerAngle = 0.99
+        elif speedY>0:
+            steerAngle = -0.99
+        else:
+            steerAngle = 0.00
+        # time.sleep(0.1)
+        # steerAngle = np.tanh(np.random.randn(self.dim_action))
             print("steerAngle:",steerAngle)
         # return np.tanh(np.random.randn(self.dim_action)) # random action
         return [steerAngle] # random action
