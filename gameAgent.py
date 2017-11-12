@@ -2,13 +2,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 # import keras
 import time
-
+from helper.preprocessing import preProcess
 
 class Agent(object):
 
     def __init__(self, dim_action, verbose=False):
         self.dim_action = dim_action
         self.verbose = verbose
+        self.preProcess = preProcess()
 
     def debugger(self, *args, **kwargs):
         # for arg in args:
@@ -50,18 +51,22 @@ class Agent(object):
         # print ("rpm",rpm)
         # print ("wheelSpinVel",wheelSpinVel)
 
-        self.debugger("speedX", speedX)
-        self.debugger("speedY", speedY)
-        self.debugger("speedZ", speedZ)
+        # self.debugger("speedX", speedX)
+        # self.debugger("speedY", speedY)
+        # self.debugger("speedZ", speedZ)
         # self.debugger("opponents",opponents)
-        self.debugger("focus", focus)  # 5 range finder sensors
-        self.debugger("track", track)  # 19 range finder sensors
+        # self.debugger("focus", focus)  # 5 range finder sensors
+        # self.debugger("track", track)  # 19 range finder sensors
 
-        self.debugger("angle", angle)
-        self.debugger("rpm", rpm)
-        self.debugger("wheelSpinVel", wheelSpinVel)
+        # self.debugger("angle", angle)
+        # self.debugger("rpm", rpm)
+        # self.debugger("wheelSpinVel", wheelSpinVel)
+
 
         # steerAngle = angle/3.14
+        featureVect,vect_dim = self.preProcess.getVector(ob,vision_on)
+        
+        # self.debugger(featureVect,vect_dim)
 
         steerAngle = np.tanh(angle/3.14)
         # time.sleep(0.1)

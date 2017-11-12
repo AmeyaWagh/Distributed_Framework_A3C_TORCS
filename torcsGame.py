@@ -15,7 +15,7 @@ step = 0
 # Generate a Torcs environment
 env = TorcsEnv(vision=vision, throttle=False ,textMode=True,xmlPath='./gym_torcs/practice.xml')
 
-agent = Agent(1,verbose=False)  # steering only
+agent = Agent(1,verbose=True)  # steering only
 
 
 print("TORCS Experiment Start.")
