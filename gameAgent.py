@@ -40,16 +40,16 @@ class Agent(object):
             """
             print(vision.shape)
 
-        # print ("speedX",speedX)
-        # print ("speedY",speedY)
-        # print ("speedZ",speedZ)
-        # # print ("opponents",opponents)
-        # print ("focus",focus) # 5 range finder sensors
-        # print ("track",track) # 19 range finder sensors
+        print ("speedX",speedX)
+        print ("speedY",speedY)
+        print ("speedZ",speedZ)
+        # print ("opponents",opponents)
+        print ("focus",focus) # 5 range finder sensors
+        print ("track",track) # 19 range finder sensors
 
-        # print ("angle",angle)
-        # print ("rpm",rpm)
-        # print ("wheelSpinVel",wheelSpinVel)
+        print ("angle",angle)
+        print ("rpm",rpm)
+        print ("wheelSpinVel",wheelSpinVel)
 
         # self.debugger("speedX", speedX)
         # self.debugger("speedY", speedY)
@@ -66,11 +66,17 @@ class Agent(object):
         # steerAngle = angle/3.14
         featureVect,vect_dim = self.preProcess.getVector(ob,vision_on)
         
-        # self.debugger(featureVect,vect_dim)
+        self.debugger('featureVect',featureVect,'vect_dim',vect_dim)
 
-        steerAngle = np.tanh(angle/3.14)
+
+        steerAngle = np.tanh(10*angle/3.14)
         # time.sleep(0.1)
         # steerAngle = np.tanh(np.random.randn(self.dim_action))
-        print("steerAngle:", steerAngle/3.14)
-        # return np.tanh(np.random.randn(self.dim_action)) # random action
-        return [steerAngle]  # random action
+        print("steerAngle:", steerAngle/3.14,'\n')
+        # steerout = np.tanh(np.random.randn(self.dim_action)) # random action
+        # print("steerout",type(steerout),steerout)
+        # return steerout
+
+        steerAngle = np.array([steerAngle])
+        print('steerAngle',type(steerAngle),steerAngle)
+        return steerAngle  # random action
