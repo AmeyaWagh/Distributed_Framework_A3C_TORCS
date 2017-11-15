@@ -4,6 +4,7 @@ from gameAgent import Agent
 import numpy as np
 import os
 import time
+import random
 
 vision = False
 episode_count = 10
@@ -17,6 +18,7 @@ env = TorcsEnv(vision=vision, throttle=False ,textMode=True,xmlPath='./gym_torcs
 
 agent = Agent(1,verbose=True)  # steering only
 
+epsilon=1.0
 
 print("TORCS Experiment Start.")
 for i in range(episode_count):
@@ -31,14 +33,16 @@ for i in range(episode_count):
             ob = env.reset()
 
         total_reward = 0.
+        prev_ob = ob
+        action=np.array([random.uniform(0,1)])
         for j in range(max_steps):
-            action = agent.act(ob, reward, done, vision)
 
             ob, reward, done, _ = env.step(action)
+            action = agent.act(env, ob, prev_ob, reward, done, vision)
             #print(ob)
             total_reward += reward
             print ("reward",reward)
-
+            prev_ob = ob
             step += 1
             if done:
                 print('-'*80,'\nDone\n','-'*80)
