@@ -5,42 +5,138 @@ import time
 from helper.preprocessing import preProcess
 from networks.models import ActorModel, CriticModel
 import random
+from keras.models import model_from_json
+from keras.optimizers import RMSprop, SGD
+import os
 
 class Agent(object):
 
-    def __init__(self, dim_action, verbose=False,gamma=0.975,batchSize=10):
+    def __init__(self, dim_action, verbose=False,gamma=0.975,batchSize=50):
         self.dim_action = dim_action
         self.verbose = verbose
         self.preProcess = preProcess()
         self.ReplayBuffActor = list()
         self.ReplayBuffCritic = list()
-        self.maxBuffLen = 20
-        self.actor = ActorModel(3,1).actor
-        self.critic = CriticModel(3).critic
+        self.maxBuffLen = 100
+        self.modelPath = './models'
+        self.loadModel()  
+        # self.actor = ActorModel(3,1).actor
+        # self.critic = CriticModel(3).critic
         self.gamma = gamma
         self.batchSize = batchSize
+
+    def loadModel(self):
+        '''
+            load trained model from model.json and weights from model.h5
+        '''
+        self.actor=None
+        self.critic=None
+
+        if os.path.isdir(self.modelPath):
+            if os.path.exists(os.path.join(self.modelPath,'actor.json')) and os.path.exists(os.path.join(self.modelPath,'actor.h5')):
+                with open(
+                        os.path.join(self.modelPath, 'actor.json'), 'r') as json_file:
+                    loaded_model_json = json_file.read()
+
+                loaded_model = model_from_json(loaded_model_json)
+
+                # load weights into new model
+                loaded_model.load_weights(os.path.join(self.modelPath, "actor.h5"))
+                a_optimizer = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
+                loaded_model.compile(loss='mse',
+                                     optimizer=a_optimizer,
+                                     metrics=['accuracy'])
+                print("Loaded actor from disk")
+                self.actor=loaded_model
+            
+            else:
+                self.actor = ActorModel(3,1).actor
+                print("New Actor Created")
+                    
+
+            if os.path.exists(os.path.join(self.modelPath,'critic.json')) and os.path.exists(os.path.join(self.modelPath,'critic.h5')):
+                with open(
+                        os.path.join(self.modelPath, 'critic.json'), 'r') as json_file:
+                    loaded_model_json = json_file.read()
+
+                loaded_model = model_from_json(loaded_model_json)
+
+                # load weights into new model
+                loaded_model.load_weights(os.path.join(self.modelPath, "actor.h5"))
+                c_optimizer = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
+                loaded_model.compile(loss='mse',
+                                     optimizer=c_optimizer,
+                                     metrics=['accuracy'])
+                print("Loaded critic from disk")
+                self.critic=loaded_model
+            else:
+                self.critic = CriticModel(3).critic
+                print("New Critic Created")
+
+        else:
+            if self.actor is None:
+                self.actor = ActorModel(3,1).actor
+                print("New Actor Created")
+            
+            if self.critic is None:
+                self.critic = CriticModel(3).critic
+                print("New Critic Created")
+
+            else:
+                raise AttributeError("Something went wrong in loading models")    
+
+
+    def dumpModels(self):
+        if not os.path.isdir(self.modelPath):
+            os.mkdir(self.modelPath)
+            print("Directory created at ",self.modelPath)
+        
+        # Actor
+
+        # serialize model to JSON
+        model_json = self.actor.to_json()
+        with open(os.path.join(self.modelPath,"actor.json"), "w") as json_file:
+            json_file.write(model_json)
+        # serialize weights to HDF5
+        self.actor.save_weights(os.path.join(self.modelPath,"actor.h5"))
+        print("Saved Actor to disk")
+
+        # Critic
+        # serialize model to JSON
+        model_json = self.critic.to_json()
+        with open(os.path.join(self.modelPath,"critic.json"), "w") as json_file:
+            json_file.write(model_json)
+        # serialize weights to HDF5
+        self.critic.save_weights(os.path.join(self.modelPath,"critic.h5"))
+        print("Saved Critic to disk")
+
+    
+
 
     def debugger(self, *args, **kwargs):
         # for arg in args:
         if self.verbose is True:
             print(args)
 
+
     def act(self,env,ob,reward, done, vision_on):
         
+        # os.system('clear')
+
         observation,vect_dim = self.preProcess.getVector(ob,vision_on)
 
         # [r,c] = vect_dim
-        self.debugger('observation',observation,'vect_dim',vect_dim)
+        # self.debugger('observation',observation,'vect_dim',vect_dim)
         action = self.actor.predict(np.reshape(observation,(1,vect_dim[0]))) 
-        print("new_action",action)
+        # print("new_action",action)
 
         new_observation,new_reward,done,_ = env.step(np.array([action]))
         new_ob=new_observation
         new_observation,vect_dim = self.preProcess.getVector(new_observation,vision_on)
-        print('new_observation',new_observation,'new_reward',new_reward)    
+        # print('new_observation',new_observation,'new_reward',new_reward)    
 
         orig_val = self.critic.predict(np.reshape(observation,(1,vect_dim[0])))
-        print('orig_val',orig_val,'new_action',action)
+        # print('orig_val',orig_val,'new_action',action)
 
         new_val = self.critic.predict(np.reshape(new_observation,(1,vect_dim[0])))
 
@@ -63,8 +159,8 @@ class Agent(object):
         self.ReplayBuffActor.append([observation,action,actor_delta])
         
         #--------------------------------------------------------------------------------#
-        print('shape of Actor replay',np.shape(self.ReplayBuffActor))
-        print('shape of Critic replay',np.shape(self.ReplayBuffCritic))
+        # print('shape of Actor replay',np.shape(self.ReplayBuffActor))
+        # print('shape of Critic replay',np.shape(self.ReplayBuffCritic))
 
         # Critic Replay training
         if len(self.ReplayBuffCritic) > self.maxBuffLen:
@@ -80,7 +176,8 @@ class Agent(object):
                 y_train.append(np.reshape(_val,(1,)))
             X_train=np.array(X_train)
             y_train=np.array(y_train)
-            print('X_train shape',np.shape(X_train))
+            # print('X_train shape',np.shape(X_train))
+            print('train Critic')
             self.critic.fit(X_train,y_train,batch_size=self.batchSize,epochs=1,verbose=1)
 
         if len(self.ReplayBuffActor) > self.maxBuffLen:
@@ -97,6 +194,7 @@ class Agent(object):
                 y_train.append(y.reshape((1,)))
             X_train = np.array(X_train)
             y_train = np.array(y_train)
+            print('train Actor')
             self.actor.fit(X_train, y_train, batch_size=self.batchSize, epochs=1, verbose=1)
 
 
@@ -104,5 +202,5 @@ class Agent(object):
         steerAngle = action
         
         steerAngle = np.array([steerAngle])
-        print('steerAngle',type(steerAngle),steerAngle)
+        print('steerAngle',steerAngle)
         return steerAngle,new_ob  # random action

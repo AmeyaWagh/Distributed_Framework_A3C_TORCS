@@ -7,7 +7,7 @@ import time
 import random
 
 vision = False
-episode_count = 10
+episode_count = 100
 max_steps = 5000
 reward = 0
 done = False
@@ -18,7 +18,7 @@ env = TorcsEnv(vision=vision, throttle=False ,textMode=True,xmlPath='./gym_torcs
 
 agent = Agent(1,verbose=True)  # steering only
 
-epsilon=0.1
+epsilon=0.3
 
 print("TORCS Experiment Start.")
 for i in range(episode_count):
@@ -61,6 +61,7 @@ for i in range(episode_count):
     except KeyboardInterrupt:
         print ("process killed by user")
         os.system('pkill torcs')
+        agent.dumpModels()
         quit()
 
 env.end()  # This is for shutting down TORCS
