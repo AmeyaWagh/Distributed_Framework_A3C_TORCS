@@ -22,7 +22,7 @@ class ActorModel():
         actor_model.add(Activation('relu'))
 
         actor_model.add(Dense(self.ACTION_SPACE, kernel_initializer='lecun_uniform'))
-        actor_model.add(Activation('linear'))
+        actor_model.add(Activation('tanh'))
 
         a_optimizer = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
         actor_model.compile(loss='mse', optimizer=a_optimizer)

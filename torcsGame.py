@@ -18,7 +18,7 @@ env = TorcsEnv(vision=vision, throttle=False ,textMode=True,xmlPath='./gym_torcs
 
 agent = Agent(1,verbose=True)  # steering only
 
-epsilon=1.0
+epsilon=0.1
 
 print("TORCS Experiment Start.")
 for i in range(episode_count):
@@ -33,16 +33,22 @@ for i in range(episode_count):
             ob = env.reset()
 
         total_reward = 0.
-        prev_ob = ob
+        # prev_ob = ob
         action=np.array([random.uniform(0,1)])
         for j in range(max_steps):
 
             ob, reward, done, _ = env.step(action)
-            action = agent.act(env, ob, prev_ob, reward, done, vision)
+            if (random.random()<epsilon):
+                print("Random Exploration")
+                action=np.array([random.uniform(-1,1)])
+            else:
+                op = agent.act(env, ob, reward, done, vision)
+                action = op[0]
+            # new_ob = op[1]
             #print(ob)
             total_reward += reward
             print ("reward",reward)
-            prev_ob = ob
+            # prev_ob = new_ob
             step += 1
             if done:
                 print('-'*80,'\nDone\n','-'*80)
