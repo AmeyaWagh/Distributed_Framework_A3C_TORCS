@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 # import keras
 import time
 from helper.preprocessing import preProcess
+from networks.models import ActorModel, CriticModel
 
 class Agent(object):
 
@@ -10,6 +11,11 @@ class Agent(object):
         self.dim_action = dim_action
         self.verbose = verbose
         self.preProcess = preProcess()
+        self.ReplayBuffActor = list()
+        self.ReplayBuffCritic = list()
+        self.maxBuffLen = 80
+        self.actor = ActorModel(3,1).actor
+        self.critic = CriticModel(3).critic
 
     def debugger(self, *args, **kwargs):
         # for arg in args:
@@ -65,9 +71,23 @@ class Agent(object):
 
         # steerAngle = angle/3.14
         featureVect,vect_dim = self.preProcess.getVector(ob,vision_on)
-        
+
+        # [r,c] = vect_dim
         self.debugger('featureVect',featureVect,'vect_dim',vect_dim)
 
+        orig_val = self.critic.predict(np.reshape(featureVect,(1,vect_dim[0])))
+        # orig_val = self.critic.predict(featureVect.T)
+        new_action = self.actor.predict(np.reshape(featureVect,(1,vect_dim[0]))) 
+        # new_action = self.actor.predict(featureVect.T) 
+        print('orig_val',orig_val,'new_action',new_action)
+
+
+        self.ReplayBuffActor.append(featureVect)
+        print('shape of replay',np.shape(self.ReplayBuffActor))
+
+        if len(self.ReplayBuffActor) > 80:
+            self.ReplayBuffActor.pop(0)
+            print('-')
 
         steerAngle = np.tanh(10*angle/3.14)
         # time.sleep(0.1)
