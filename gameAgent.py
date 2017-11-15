@@ -11,14 +11,16 @@ import os
 
 class Agent(object):
 
-    def __init__(self, dim_action, verbose=False,gamma=0.975,batchSize=50):
+    def __init__(self, dim_action, verbose=False,gamma=0.975,maxBuffLen=100,batchSize=50):
         self.dim_action = dim_action
         self.verbose = verbose
         self.preProcess = preProcess()
         self.ReplayBuffActor = list()
         self.ReplayBuffCritic = list()
-        self.maxBuffLen = 100
+        self.maxBuffLen = maxBuffLen
         self.modelPath = './models'
+        self.OBSERVATION_SPACE = 1
+        self.ACTION_SPACE = 1
         self.loadModel()  
         # self.actor = ActorModel(3,1).actor
         # self.critic = CriticModel(3).critic
@@ -50,7 +52,7 @@ class Agent(object):
                 self.actor=loaded_model
             
             else:
-                self.actor = ActorModel(3,1).actor
+                self.actor = ActorModel(self.OBSERVATION_SPACE,1).actor
                 print("New Actor Created")
                     
 
@@ -70,16 +72,16 @@ class Agent(object):
                 print("Loaded critic from disk")
                 self.critic=loaded_model
             else:
-                self.critic = CriticModel(3).critic
+                self.critic = CriticModel(self.ACTION_SPACE).critic
                 print("New Critic Created")
 
         else:
             if self.actor is None:
-                self.actor = ActorModel(3,1).actor
+                self.actor = ActorModel(self.OBSERVATION_SPACE,1).actor
                 print("New Actor Created")
             
             if self.critic is None:
-                self.critic = CriticModel(3).critic
+                self.critic = CriticModel(self.ACTION_SPACE).critic
                 print("New Critic Created")
 
             else:
@@ -198,8 +200,8 @@ class Agent(object):
             self.actor.fit(X_train, y_train, batch_size=self.batchSize, epochs=1, verbose=1)
 
 
-        # steerAngle = np.tanh(20*observation[0]/3.14) #observation[0] is angle
-        steerAngle = action
+        # steerAngle = np.tanh(20*observation[0]) #observation[0] is angle
+        steerAngle = -20*action[0][0]
         
         steerAngle = np.array([steerAngle])
         print('steerAngle',steerAngle)

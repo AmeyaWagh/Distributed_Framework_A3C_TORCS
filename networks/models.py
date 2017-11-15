@@ -4,8 +4,8 @@ from keras.layers.core import Dense, Dropout, Activation
 from keras.optimizers import RMSprop, SGD
 
 
-HIDDEN_LAYER1=300
-HIDDEN_LAYER2=600
+HIDDEN_LAYER1=164
+HIDDEN_LAYER2=150
 
 class ActorModel():
     def __init__(self,OBSERVATION_SPACE,ACTION_SPACE):

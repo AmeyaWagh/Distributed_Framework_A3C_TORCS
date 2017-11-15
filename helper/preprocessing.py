@@ -37,8 +37,8 @@ class preProcess():
         '''
         # angle -pi<a<pi
         self.featureVect.append(angle/np.pi)
-        self.featureVect.append(rpm/self.maxRpm)
-        self.featureVect.append(speedX/self.maxSpeed)
+        # self.featureVect.append(rpm/self.maxRpm)
+        # self.featureVect.append(speedX/self.maxSpeed)
 
         self.featureVect = np.array(self.featureVect)
         vect_dim = np.shape(self.featureVect)
