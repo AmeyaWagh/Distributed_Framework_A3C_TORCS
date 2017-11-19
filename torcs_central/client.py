@@ -1,6 +1,7 @@
 from websocket import create_connection
 import time
 import json
+import traceback
 # ws = create_connection("ws://echo.websocket.org/")
 # ws = create_connection("ws://130.215.219.68:9090/ws")
 # print("Sending 'Hello, World'...")
@@ -28,11 +29,19 @@ class wsClient():
         print("Received '%s'" % result)
 
     def sendMessage(self,msg):
-        msg = json.dumps(msg)
+        # msg = json.dumps(msg)
         try:
             self.ws.send(msg)
-        except:
-            print("Something went wrong")
+            result =  self.ws.recv()
+            p=json.loads(result)
+            k=json.loads(p)
+            print(p,type(p))
+            print(k,type(k),k['data'])
+            # print(">>",json.loads(result)['data'])
+            # print("Received '%s'" % result)
+        except Exception as e:
+            traceback.print_exc(e)
+            print("Something went wrong while sending data")
 
     def closeConnection(self):
         self.ws.close()
@@ -41,7 +50,8 @@ if __name__ == '__main__':
     torcs_client = wsClient()
     torcs_client.testServer()
     for i in range(10):
-        torcs_client.sendMessage(str(i))
+        myjson = json.dumps({"data":i})
+        torcs_client.sendMessage(myjson)
         print(i)
         time.sleep(0.5)
     torcs_client.closeConnection()        

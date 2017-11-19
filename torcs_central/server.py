@@ -2,6 +2,7 @@ import tornado.ioloop
 import tornado.web
 import tornado.websocket
 import tornado.template
+import json
 
 class MainHandler(tornado.web.RequestHandler):
   def get(self):
@@ -14,8 +15,13 @@ class WSHandler(tornado.websocket.WebSocketHandler):
     self.write_message("The server says: 'Hello'. Connection was accepted.")
 
   def on_message(self, message):
-    self.write_message("The server says: " + message + " back at you")
-    print 'received:', message
+    # self.write_message("The server says: " + message + " back at you")
+    self.write_message(json.dumps(message))
+    # message = str(message)
+    # print 'received:', message.split()
+    print 'request:',self.request.body.decode('utf-8')
+    print 'received:', message,type(message)
+    # print json.loads(message)
 
   def on_close(self):
     print 'connection closed...'

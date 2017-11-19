@@ -1,4 +1,5 @@
 {
-	"ip":"130.215.219.68",
-	"port":9090
+	"ip":"localhost",
+	"port":9090,
+	"clientID":"ameya"
 }
