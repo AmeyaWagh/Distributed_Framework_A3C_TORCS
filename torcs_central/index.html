@@ -1,15 +1,20 @@
 <html>
    <head>
       <title>{{ title }}</title>
+      
    </head>
    <body>
     <h1>ASYNCHRONOUS REINFORCEMENT LEARNING- TORCS A3C</h1>
-     <ul>
       <h2>JSON data</h2>
-       <!-- {% for item in items %}
-         <li>{{ escape(item) }}</li>
-       {% end %} -->
-       {{ items }}
+     <ul>
+       
+      <div>
+        <h3>Logger</h3>
+       <!-- {{ items }} -->
+       {% for item in items %}
+         <li>{{ item }}</li>
+       {% end %}
+       
      </ul>
    </body>
     <script>
@@ -19,6 +24,7 @@
            window.location.reload();
       }
        
-       setInterval('autoRefresh1()', 5000); // this will reload page after every 5 secounds; Method II
+       setInterval('autoRefresh1()', 1000); // this will reload page after every 5 secounds; Method II
     </script>
+    
  </html>

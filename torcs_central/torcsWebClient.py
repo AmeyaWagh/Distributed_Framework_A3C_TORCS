@@ -1,16 +1,25 @@
 import requests
 import json
+import time
 
-config = json.load(open("./config.json"))
 
-ip=config['ip']
-port=config['port']
-clientID=config['clientID']
+class torcsWebClient():
+	def __init__(self):
+		self.config = json.load(open("./config.json"))
+		self.ip=self.config['ip']
+		self.port=self.config['port']
+		self.clientID=self.config['clientID']
+		self.url = "http://{}:{}/".format(self.ip,self.port)
 
-payload = {"clientID":clientID,
-			"data":{'key1': 'value1', 
-					'key2': 'value2'}
-		}
+	def pushData(self,jsonData):
+		r = requests.post(self.url, json=jsonData)
+		print(r.text)
 
-r = requests.post("http://localhost:9090/", json=payload)
-print(r.text)
+if __name__ == '__main__':
+	t_client = torcsWebClient()
+	for i in range(10):
+		payload = {"clientID":t_client.clientID,
+					"data":{'value': i}
+					}
+		t_client.pushData(payload)
+		time.sleep(2)	

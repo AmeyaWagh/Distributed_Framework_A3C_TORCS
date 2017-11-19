@@ -4,14 +4,14 @@ import tornado.ioloop
 import tornado.web
 
 global resource
-resource={}
+resource=[]
 
 class MyHandler(tornado.web.RequestHandler):
     def post(self):
         data = json.loads(self.request.body.decode('utf-8'))
         print('Got JSON data:', data)
         global resource
-        resource = data
+        resource.append(data)
         self.write({ 'got' : 'your data' })
 
     def get(self):
