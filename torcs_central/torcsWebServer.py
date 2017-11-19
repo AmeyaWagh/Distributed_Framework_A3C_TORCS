@@ -2,21 +2,39 @@ import json
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
+import datetime
 
 global resource
 resource=[]
+log=[]
+
+def handlerequest(request):
+    cmd=request['cmd']
+    if cmd=='ping':
+        return json.dumps({"response":"ping_success","status":0})
+    elif cmd=='updateResource':
+        return json.dumps({"response":"update_success","status":0})
+    elif cmd=='fetchResource':
+        return json.dumps({"response":"update_success","status":0,"data":resource})
+    else:
+        return request
 
 class MyHandler(tornado.web.RequestHandler):
     def post(self):
         data = json.loads(self.request.body.decode('utf-8'))
-        print('Got JSON data:', data)
+        print(data)
         global resource
         resource.append(data)
-        self.write({ 'got' : 'your data' })
+        log.append([data['clientID'],data['cmd'],datetime.datetime.now().isoformat()])
+        self.write(handlerequest(data))
 
     def get(self):
         # items = ["Item 1", "Item 2", "Item 3"]
-        items = resource
+        # if resource is not None:
+        #     items = [[elem['clientID'],elem['cmd']] for elem in resource]
+        # else:
+        #     items = []
+        items=log
         self.render("index.html", title="TORCS_A3C", items=items)    
 
 if __name__ == '__main__':
