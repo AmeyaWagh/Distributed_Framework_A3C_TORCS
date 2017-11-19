@@ -35,6 +35,7 @@ for i in range(episode_count):
         total_reward = 0.
         # prev_ob = ob
         action=np.array([random.uniform(0,1)])
+        agent.pullFromServer()
         for j in range(max_steps):
             # os.system('clear')
             ob, reward, done, _ = env.step(action)
@@ -53,6 +54,7 @@ for i in range(episode_count):
             step += 1
             if done:
                 print('-'*80,'\nDone\n','-'*80)
+                agent.pushToServer()
                 break
 
         print("TOTAL REWARD @ " + str(i) +" -th Episode  :  " + str(total_reward))

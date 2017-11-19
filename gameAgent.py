@@ -8,6 +8,8 @@ import random
 from keras.models import model_from_json
 from keras.optimizers import RMSprop, SGD
 import os
+from torcs_central.torcsWebClient import torcsWebClient
+from keras.utils import plot_model
 
 class Agent(object):
 
@@ -19,6 +21,7 @@ class Agent(object):
         self.ReplayBuffCritic = list()
         self.maxBuffLen = maxBuffLen
         self.modelPath = './models'
+        self.plotterPath = './plots'
         self.OBSERVATION_SPACE = 1
         self.ACTION_SPACE = 1
         self.loadModel()  
@@ -26,6 +29,34 @@ class Agent(object):
         # self.critic = CriticModel(3).critic
         self.gamma = gamma
         self.batchSize = batchSize
+        self.t_client = torcsWebClient(configPath="./torcs_central/config.json")
+        if self.t_client.pingServer():
+            print("pulling weights")
+            self.weights = self.t_client.pullData()
+        else:
+            print("Error communicating with server")
+            raise AttributeError("Could not able to connect to Server")
+
+    def pushToServer(self):
+        payload = {
+                    "actor":[0,1,2,3,4],
+                    "critic":[0,1,2,3,4]
+                    }
+        if self.t_client.pingServer(): 
+            print("pushing weights to server")           
+            self.t_client.pushData(payload)
+        else:
+            print("Error communicating with server")
+            raise AttributeError("Could not able to connect to Server")
+
+    def pullFromServer(self):
+        if self.t_client.pingServer(): 
+            print("pulling weights from server")           
+            self.weights = self.t_client.pullData()
+            print(self.weights)
+        else:
+            print("Error communicating with server")
+            raise AttributeError("Could not able to connect to Server")
 
     def loadModel(self):
         '''
@@ -93,6 +124,7 @@ class Agent(object):
             os.mkdir(self.modelPath)
             print("Directory created at ",self.modelPath)
         
+
         # Actor
 
         # serialize model to JSON
@@ -112,6 +144,14 @@ class Agent(object):
         self.critic.save_weights(os.path.join(self.modelPath,"critic.h5"))
         print("Saved Critic to disk")
 
+        self.pushToServer()
+        # print("weights:",self.actor.trainable_weights,type(self.actor.trainable_weights))
+        # print("weights:",self.actor.trainable_weights,type(self.actor.trainable_weights))
+        
+        # if not os.path.isdir(self.plotterPath):
+        #     os.mkdir(self.plotterPath)
+        #     plot_model(self.actor, to_file=os.path.join(self.plotterPath,'actor.png'))
+        #     plot_model(self.critic, to_file=os.path.join(self.plotterPath,'critic.png'))
     
 
 

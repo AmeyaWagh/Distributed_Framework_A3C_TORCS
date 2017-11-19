@@ -1,5 +1,6 @@
 {
 	"ip":"localhost",
 	"port":9090,
-	"clientID":"ameya"
+	"clientID":"ameya",
+	"resourcePath":"./resource"
 }

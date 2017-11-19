@@ -4,8 +4,8 @@ import time
 
 
 class torcsWebClient():
-	def __init__(self):
-		self.config = json.load(open("./config.json"))
+	def __init__(self,configPath="./config.json"):
+		self.config = json.load(open(configPath))
 		self.ip=self.config['ip']
 		self.port=self.config['port']
 		self.clientID=self.config['clientID']
@@ -15,7 +15,9 @@ class torcsWebClient():
 		jsonData={"cmd":"updateResource",
 					"clientID":self.clientID}
 		jsonData.update({"data":Data})
-		r = requests.post(self.url, json=jsonData)
+		files = {"actor":open('./models/actor.h5','rb'),"critic":open('./models/critic.h5','rb')}
+		r = requests.post(self.url+'upload', files=files)
+		# r = requests.post(self.url, json=jsonData)
 		print(r.json())
 
 	def pullData(self):
@@ -37,7 +39,7 @@ class torcsWebClient():
 			return False
 
 if __name__ == '__main__':
-	t_client = torcsWebClient()
+	t_client = torcsWebClient(configPath="./config.json")
 	for i in range(10):
 		payload = {"cmd":"updateResource",
 					"clientID":t_client.clientID,
