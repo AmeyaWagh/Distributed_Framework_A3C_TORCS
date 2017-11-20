@@ -61,7 +61,7 @@ then
     cd ../
     chmod 777 *
     cd ../
-
+    chmod +x runTorcs.sh
 else
     echo "Skipping download"
 fi
