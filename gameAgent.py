@@ -10,6 +10,7 @@ from keras.optimizers import RMSprop, SGD
 import os
 from torcs_central.torcsWebClient import torcsWebClient
 from keras.utils import plot_model
+import json
 
 class Agent(object):
 
@@ -29,6 +30,7 @@ class Agent(object):
         # self.critic = CriticModel(3).critic
         self.gamma = gamma
         self.batchSize = batchSize
+        self.config = json.load(open('./torcs_central/config.json'))
         self.t_client = torcsWebClient(configPath="./torcs_central/config.json")
         if self.t_client.pingServer():
             print("pulling weights")
@@ -57,6 +59,19 @@ class Agent(object):
         else:
             print("Error communicating with server")
             raise AttributeError("Could not able to connect to Server")
+            
+        if os.path.isdir(self.config['pulledModels']):
+            self.actor.load_weights(os.path.join(self.config['pulledModels'], "actor.h5"))
+            a_optimizer = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
+            self.actor.compile(loss='mse',
+                                 optimizer=a_optimizer,
+                                 metrics=['accuracy'])
+            self.critic.load_weights(os.path.join(self.config['pulledModels'], "critic.h5"))
+            a_optimizer = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
+            self.critic.compile(loss='mse',
+                                 optimizer=a_optimizer,
+                                 metrics=['accuracy'])
+
 
     def loadModel(self):
         '''
