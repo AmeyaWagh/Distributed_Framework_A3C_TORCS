@@ -3,3 +3,4 @@ __pycache__/
 models/
 old_models/
 resource/
+pulledModels/

@@ -54,7 +54,8 @@ for i in range(episode_count):
             step += 1
             if done:
                 print('-'*80,'\nDone\n','-'*80)
-                agent.pushToServer()
+                # agent.pushToServer()
+                agent.dumpModels()
                 break
 
         print("TOTAL REWARD @ " + str(i) +" -th Episode  :  " + str(total_reward))
