@@ -32,11 +32,11 @@ class Download(tornado.web.RequestHandler):
         if os.path.exists(os.path.join(resourcePath,'actor.h5')) and os.path.exists(os.path.join(resourcePath,'critic.h5')):
             filename = self.get_arguments('file',True)[0]
             if filename=='actor':
-                with open(os.path.join(resourcePath,'actor.h5')) as fp:
+                with open(os.path.join(resourcePath,'actor.h5'),'rb') as fp:
                     fileData = fp.read()
                 self.write(fileData)
             elif filename=='critic':
-                with open(os.path.join(resourcePath,'actor.h5')) as fp:
+                with open(os.path.join(resourcePath,'actor.h5'),'rb') as fp:
                     fileData = fp.read()
                 self.write(fileData)
             else:
