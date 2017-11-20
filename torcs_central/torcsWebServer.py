@@ -27,6 +27,26 @@ def handlerequest(request):
     else:
         return request
 
+class Download(tornado.web.RequestHandler):
+    def get(self,key):
+        if os.path.exists(os.path.join(resourcePath,'actor.h5')) and os.path.exists(os.path.join(resourcePath,'critic.h5')):
+            filename = self.get_arguments('file',True)[0]
+            if filename=='actor':
+                with open(os.path.join(resourcePath,'actor.h5')) as fp:
+                    fileData = fp.read()
+                self.write(fileData)
+            elif filename=='critic':
+                with open(os.path.join(resourcePath,'actor.h5')) as fp:
+                    fileData = fp.read()
+                self.write(fileData)
+            else:
+                self.write(json.dumps({"actor":None,"critic":None}))
+            # with open(os.path.join(resourcePath,'critic.h5')) as fp:
+            #     criticData = fp.read()
+            # self.write(json.dumps({"actor":open(os.path.join(resourcePath,'actor.h5')),"critic":open(os.path.join(resourcePath,'critic.h5'))}))
+        else:
+            self.write(json.dumps({"actor":None,"critic":None}))
+
 
 class Upload(tornado.web.RequestHandler):
     def post(self):
@@ -65,7 +85,8 @@ class MyHandler(tornado.web.RequestHandler):
 if __name__ == '__main__':
     app = tornado.web.Application([ 
         tornado.web.url(r'/', MyHandler),
-        tornado.web.url(r'/upload', Upload) ])
+        tornado.web.url(r'/upload', Upload) ,
+        tornado.web.url(r'/download/(.*)', Download) ])
     http_server = tornado.httpserver.HTTPServer(app)
     http_server.listen(9090)
     print('Starting server on port 9090')
