@@ -97,7 +97,7 @@ if __name__ == '__main__':
     settings = {
         "debug": True,
         "template_path": os.path.join(os.getcwd(),"torcs_central","templates"),
-        "static_path": os.path.join(os.getcwd(),"torcs_central","templates","assets","css")
+        "static_path": os.path.join(os.getcwd(),"torcs_central","templates")
         }
     app = tornado.web.Application([ 
         tornado.web.url(r'/', MyHandler),

@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <!-- <link rel="stylesheet" href="./assets/css/main.css"> -->
-  <link rel="stylesheet" type="text/css" href="{{ static_url("main.css") }}">
+  <link rel="stylesheet" type="text/css" href="{{ static_url("assets/css/main.css") }}">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
@@ -24,10 +24,10 @@
     </div>
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
-        <li class="active"><a href="#">Dashboard</a></li>
-        <li><a href="#">Age</a></li>
-        <li><a href="#">Gender</a></li>
-        <li><a href="#">Geo</a></li>
+        <li class="active"><a href="#dashboard">Dashboard</a></li>
+        <li><a href="#plots">Plots</a></li>
+        <li><a href="#statistics">Statistics</a></li>
+        <li><a href="#logs">Logs</a></li>
       </ul>
     </div>
   </div>
@@ -35,26 +35,24 @@
 
 <div class="container-fluid">
   <div class="row content">
-    <!-- <div class="sidebar_custom" > -->
     <div class="col-sm-3 sidenav hidden-xs " > 
       <h4>DISTRIBUTED RL FRAMEWORK</h4>
-      <!-- <div style="background:#212528;"> -->
       <ul class="nav nav-pills nav-stacked">
-        <li class="active"><a href="#section1">Dashboard</a></li>
-        <li><a href="#section2">Plots</a></li>
-        <li><a href="#section3">Statistics</a></li>
-        <li><a href="#section4">Logs</a></li>
+        <li class="active"><a href="#dashboard">Dashboard</a></li>
+        <li><a href="#plots">Plots</a></li>
+        <li><a href="#statistics">Statistics</a></li>
+        <li><a href="#logs">Logs</a></li>
       </ul><br>
-    <!-- </div> -->   
     </div>
-  <!-- </div> -->
     <br>
     
+    <!-- Dashboard -->
+    <!-- <section id="dashboard"> -->
     <div class="col-sm-9">
       <div class="well">
         <h4>DISTRIBUTED RL FRAMEWORK</h4>
         <p>Some text..</p>
-      </div>
+    </div>
 
       <div class="row">
         <div class="col-sm-3">
@@ -92,31 +90,61 @@
           </div>
         </div>
       </div>
+      <!-- </section> -->
+      <!-- Dashboard -->
 
-      <!-- <div class="row">
-        <div class="col-sm-4">
+      <div class="row">
+        <div class="col-sm-6">
           <div class="well">
-            <p>Text</p> 
-            <p>Text</p> 
-            <p>Text</p> 
+            <h4>Config</h4>
+            <div class="well">
+              text
+            </div> 
           </div>
         </div>
-        <div class="col-sm-4">
+        <div class="col-sm-6">
           <div class="well">
-            <p>Text</p> 
-            <p>Text</p> 
-            <p>Text</p> 
+            <h4>Status</h4>
+            <div class="well">
+              text
+            </div>
           </div>
         </div>
-        <div class="col-sm-4">
-          <div class="well">
-            <p>Text</p> 
-            <p>Text</p> 
-            <p>Text</p> 
-          </div>
-        </div>
-      </div> -->
+      </div>
 
+      <hr></hr>
+      <section id="plots">
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="well">
+              <h4>Plots</h4>
+              <img src="{{ static_url("assets/images/test1.png") }}" class="img-thumbnail" height="100%" width="100%">            
+            </div>
+          </div> 
+        </div>
+      </section>
+
+      <hr></hr>
+      <section id="statistics">
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="well">
+              <h4>Stats</h4>
+              <!-- <img src="{{ static_url("assets/images/test1.png") }}" class="img-thumbnail" height="100%" width="100%">             -->
+              Some Stats
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="well">
+              <h4>Stats</h4>
+              <!-- <img src="{{ static_url("assets/images/test1.png") }}" class="img-thumbnail" height="100%" width="100%">             -->
+              Some Stats
+            </div>
+          </div>  
+        </div>
+      </section>
+      <hr></hr>
+      <section id="logs">
       <div class="row">
         <div class="col-sm-12">
           <div class="well">
@@ -134,8 +162,10 @@
           </div>
         </div> -->
       </div>
+    </section>
 
     </div>
+
   </div>
 </div>
 <div id="footer">
