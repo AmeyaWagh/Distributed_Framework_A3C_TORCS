@@ -1,2 +1,8 @@
 *.pdf
 __pycache__/
+models/
+old_models/
+resource/
+pulledModels/
+torcs_central/templates/assets/images/*.png
+*.png

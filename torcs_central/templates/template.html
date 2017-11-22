@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>{{ title }}</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <!-- <link rel="stylesheet" href="./assets/css/main.css"> -->
+  <link rel="stylesheet" type="text/css" href="{{ static_url("assets/css/main.css") }}">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse visible-xs">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+      <a class="navbar-brand" href="#">Logo</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="#dashboard">Dashboard</a></li>
+        <li><a href="#plots">Plots</a></li>
+        <li><a href="#statistics">Statistics</a></li>
+        <li><a href="#logs">Logs</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid">
+  <div class="row content">
+    <div class="col-sm-3 sidenav hidden-xs " >
+    <br>
+      <h4>DISTRIBUTED RL FRAMEWORK</h4>
+    <hr>
+      <ul class="nav nav-pills nav-stacked">
+        <li class="active"><a href="#dashboard">Dashboard</a></li>
+        <li><a href="#plots">Plots</a></li>
+        <li><a href="#statistics">Statistics</a></li>
+        <li><a href="#logs">Logs</a></li>
+      </ul><br>
+    </div>
+    <br>
+    
+    <!-- Dashboard -->
+    <!-- <section id="dashboard"> -->
+    <div class="col-sm-9">
+      <div style="text-align: center;">
+      <hr>
+        <h3>DASHBOARD</h3>
+        <!-- <p>Some text..</p> -->
+    </div>
+    <br>
+
+      <div class="row">
+        <div class="col-sm-3">
+          <div class="well">
+            <h4>Workers</h4>
+            <hr>
+            <p>
+              {% for worker in workers %}
+                {{ worker }} <br>
+              {% end %}
+            </p> 
+          </div>
+        </div>
+        <!-- <div class="col-sm-3">
+          <div class="well">
+            <h4>Pages</h4>
+            <p>100 Million</p> 
+          </div>
+        </div> -->
+        <div class="col-sm-3">
+          <div class="well">
+            <h4>Max Reward</h4>
+            <hr>
+            <p>{{ maxReward}}</p> 
+          </div>
+        </div>
+        <div class="col-sm-3">
+          <div class="well">
+            <h4>Max Episodes</h4>
+            <hr>
+            <p>{{ maxEpisodes }}</p> 
+          </div>
+        </div>
+        <div class="col-sm-3">
+          <div class="well">
+            <h4>Up Time</h4>
+            <hr>
+            <p>{{ upTime }}</p> 
+          </div>
+        </div>
+      </div>
+      <!-- </section> -->
+      <!-- Dashboard -->
+
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="well">
+            <h4>Parameters</h4>
+            <hr>
+            <table style="width:100%">
+              <tr>
+                <th>Parameter</th>
+                <th>Value</th>
+              </tr>
+              {% for key,val in testParams.items() %}
+              <tr>    
+                <td> {{ key }} </td>
+                <td> {{ val }} </td>
+              </tr>
+              {% end %}
+            </table>  
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="well">
+            <h4>Activity</h4>
+            <hr>
+            <!-- <div class="well"> -->
+              {% for val in statusLog%}
+              {{ val }}<br>
+              {% end %}
+            <!-- </div> -->
+          </div>
+        </div>
+      </div>
+
+      <section id="plots">
+        
+        <div class="col-sm-12">
+          <div style="text-align: center;">
+          <hr>
+            <h3>PLOTS</h3>
+            <!-- <p>Some text..</p> -->
+        </div>
+        <br>
+
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="well">
+              <h4>Plots</h4>
+              <img src="{{ static_url("assets/images/test1.png") }}" class="img-thumbnail" height="100%" width="100%">            
+            </div>
+          </div> 
+        </div>
+      </section>
+
+      <section id="statistics">
+        <div class="col-sm-9">
+        <div style="text-align: center;">
+        <hr>
+          <h3>STATS</h3>
+          <!-- <p>Some text..</p> -->
+      </div>
+      <br>
+
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="well">
+              <h4>Stats</h4>
+              <!-- <img src="{{ static_url("assets/images/test1.png") }}" class="img-thumbnail" height="100%" width="100%">             -->
+              Some Stats
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="well">
+              <h4>Stats</h4>
+              <!-- <img src="{{ static_url("assets/images/test1.png") }}" class="img-thumbnail" height="100%" width="100%">             -->
+              Some Stats
+            </div>
+          </div>  
+        </div>
+      </section>
+
+
+      <section id="logs">
+      <div class="col-sm-9">
+        <div style="text-align: center;">
+        <hr>
+          <h3>LOGS</h3>
+          <!-- <p>Some text..</p> -->
+      </div>
+      <br>  
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="well">
+            <p>LOGS</p> 
+            <div class="well">
+              {% for item in items %}
+                <li>{{ item }}</li>
+              {% end %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    </div>
+
+  </div>
+</div>
+<div id="footer">
+
+        <!-- Copyright -->
+          <ul class="copyright">
+            <li>&copy; Ameya Wagh. All rights reserved.</li>
+          </ul>
+
+      </div>
+</body>
+ <script>
+       
+       function autoRefresh1()
+      {
+           window.location.reload();
+      }
+       
+       setInterval('autoRefresh1()', 1000); // this will reload page after every 5 secounds; Method II
+    </script>
+</html>
