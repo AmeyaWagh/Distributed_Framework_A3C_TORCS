@@ -19,15 +19,23 @@ if not os.path.isdir(resourcePath):
 
 global resource
 resource=[]
+
 log=[]
+
 workers = []
+global episode_count
 episode_count=0
+
+global rewards
 rewards = [0]
+
+global episodes
 episodes = [0]
 
 statusLog=[]
 
 parameterDict=config
+
 try:
     parameterDict.pop('clientID')
     parameterDict.pop('pulledModels')
@@ -55,7 +63,7 @@ def updateUsers():
 print("running from:",os.getcwd())
 
 #-------------------- set limit on length of logs -------------------------------------#
-def limitLog(limitLog_=20,limitStatusLog=5):
+def limitLog(limitLog_=50,limitStatusLog=20):
     if len(log)>limitLog_:
         log.pop(0)
     if len(statusLog)>limitStatusLog:
@@ -66,9 +74,12 @@ def statusHandler(metaData):
     status_str=''
     if metaData['cmd']=='updateResource':
         status_str+="Worker {} Ended game".format(metaData['clientID'])
-    if metaData['cmd']=='fetchResource':
+        statusLog.append(status_str)
+    elif metaData['cmd']=='fetchResource':
         status_str+="Worker {} Started game".format(metaData['clientID'])
-    statusLog.append(status_str)
+        statusLog.append(status_str)
+    else:
+        pass
 #-------------------- Plotter -------------------------------------#
 global plotterStarttime
 plotterStarttime=datetime.datetime.now()
@@ -137,13 +148,14 @@ class MyHandler(tornado.web.RequestHandler):
             log.append([data['clientID'],data['cmd'],time.ctime()])
             statusHandler(data)
             try:
-                if data['data']['episode_done']>=0:
+                if ('episode_done' in data['data'].keys()) and ('total_reward' in data['data'].keys()):
+                    global episode_count
                     episode_count+=1
                     episodes.append(episode_count)
                     rewards.append(data['data']['total_reward'])
-            except:
-                # traceback.print_exc(e)
-                # print("error in metaData") 
+            except Exception as e:
+                traceback.print_exc(e)
+                print("error in metaData") 
                 pass
 
         except Exception as e:

@@ -256,7 +256,7 @@ class Agent(object):
 
 
         # steerAngle = np.tanh(20*observation[0]) #observation[0] is angle
-        steerAngle = 70*action[0][0]
+        steerAngle = 50*action[0][0]
         
         steerAngle = np.array([steerAngle])
         print('steerAngle',steerAngle)
