@@ -5,10 +5,12 @@ import numpy as np
 import os
 import time
 import random
+import json
+config=json.load(open("./torcs_central/config.json"))
 
 vision = False
-episode_count = 100
-max_steps = 5000
+episode_count = config['maxEpisodes']
+max_steps = config['maxSteps']
 reward = 0
 done = False
 step = 0
@@ -18,7 +20,7 @@ env = TorcsEnv(vision=vision, throttle=False ,textMode=True,xmlPath='./gym_torcs
 
 agent = Agent(1,verbose=True)  # steering only
 
-epsilon=0.001
+epsilon=config['exploration']
 
 print("TORCS Experiment Start.")
 for i in range(episode_count):

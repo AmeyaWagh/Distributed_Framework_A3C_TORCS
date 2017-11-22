@@ -11,10 +11,12 @@ import os
 from torcs_central.torcsWebClient import torcsWebClient
 from keras.utils import plot_model
 import json
+import traceback
+config=json.load(open("./torcs_central/config.json"))
 
 class Agent(object):
 
-    def __init__(self, dim_action, verbose=False,gamma=0.975,maxBuffLen=100,batchSize=50):
+    def __init__(self, dim_action, verbose=False,gamma=config['gamma'],maxBuffLen=config['maxBuffLen'],batchSize=config['batchSize']):
         self.dim_action = dim_action
         self.verbose = verbose
         self.preProcess = preProcess()
@@ -25,12 +27,13 @@ class Agent(object):
         self.plotterPath = './plots'
         self.OBSERVATION_SPACE = 1
         self.ACTION_SPACE = 1
+        self.config = json.load(open('./torcs_central/config.json'))
+        self.learningRate = self.config['learningRate']
         self.loadModel()  
         # self.actor = ActorModel(3,1).actor
         # self.critic = CriticModel(3).critic
         self.gamma = gamma
         self.batchSize = batchSize
-        self.config = json.load(open('./torcs_central/config.json'))
         self.t_client = torcsWebClient(configPath="./torcs_central/config.json")
         # if self.t_client.pingServer():
         #     print("pulling weights")
@@ -40,37 +43,40 @@ class Agent(object):
         #     raise AttributeError("Could not able to connect to Server")
 
     def pushToServer(self,metaData):
-        # payload = {
-        #             "actor":[0,1,2,3,4],
-        #             "critic":[0,1,2,3,4]
-        #             }
-        if self.t_client.pingServer(): 
-            print("pushing metaData to server")           
-            self.t_client.pushData(metaData)
-        else:
-            print("Error communicating with server")
-            raise AttributeError("Could not able to connect to Server")
+        try:
+            if self.t_client.pingServer(): 
+                print("pushing metaData to server")           
+                self.t_client.pushData(metaData)
+            else:
+                print("Error communicating with server")
+                raise AttributeError("Could not able to connect to Server")
+        except Exception as e:
+            print("Could not push to server")        
 
     def pullFromServer(self):
-        if self.t_client.pingServer(): 
-            print("pulling weights from server")           
-            self.weights = self.t_client.pullData()
-            print(self.weights)
-        else:
-            print("Error communicating with server")
-            raise AttributeError("Could not able to connect to Server")
-            
-        if os.path.isdir(self.config['pulledModels']):
-            self.actor.load_weights(os.path.join(self.config['pulledModels'], "actor.h5"))
-            a_optimizer = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
-            self.actor.compile(loss='mse',
-                                 optimizer=a_optimizer,
-                                 metrics=['accuracy'])
-            self.critic.load_weights(os.path.join(self.config['pulledModels'], "critic.h5"))
-            a_optimizer = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
-            self.critic.compile(loss='mse',
-                                 optimizer=a_optimizer,
-                                 metrics=['accuracy'])
+        try:
+            if self.t_client.pingServer(): 
+                print("pulling weights from server")           
+                self.weights = self.t_client.pullData()
+                print(self.weights)
+            else:
+                print("Error communicating with server")
+                raise AttributeError("Could not connect to Server")
+                
+            if os.path.isdir(self.config['pulledModels']):
+                self.actor.load_weights(os.path.join(self.config['pulledModels'], "actor.h5"))
+                a_optimizer = SGD(lr=self.learningRate, decay=1e-6, momentum=0.9, nesterov=True)
+                self.actor.compile(loss='mse',
+                                     optimizer=a_optimizer,
+                                     metrics=['accuracy'])
+                self.critic.load_weights(os.path.join(self.config['pulledModels'], "critic.h5"))
+                a_optimizer = SGD(lr=self.learningRate, decay=1e-6, momentum=0.9, nesterov=True)
+                self.critic.compile(loss='mse',
+                                     optimizer=a_optimizer,
+                                     metrics=['accuracy'])
+        except Exception as e:
+            # traceback.print_exc(e)
+            print("Could not pull from server")
 
 
     def loadModel(self):
@@ -82,15 +88,14 @@ class Agent(object):
 
         if os.path.isdir(self.modelPath):
             if os.path.exists(os.path.join(self.modelPath,'actor.json')) and os.path.exists(os.path.join(self.modelPath,'actor.h5')):
-                with open(
-                        os.path.join(self.modelPath, 'actor.json'), 'r') as json_file:
+                with open(os.path.join(self.modelPath, 'actor.json'), 'r') as json_file:
                     loaded_model_json = json_file.read()
 
                 loaded_model = model_from_json(loaded_model_json)
 
                 # load weights into new model
                 loaded_model.load_weights(os.path.join(self.modelPath, "actor.h5"))
-                a_optimizer = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
+                a_optimizer = SGD(lr=self.learningRate, decay=1e-6, momentum=0.9, nesterov=True)
                 loaded_model.compile(loss='mse',
                                      optimizer=a_optimizer,
                                      metrics=['accuracy'])
@@ -103,15 +108,14 @@ class Agent(object):
                     
 
             if os.path.exists(os.path.join(self.modelPath,'critic.json')) and os.path.exists(os.path.join(self.modelPath,'critic.h5')):
-                with open(
-                        os.path.join(self.modelPath, 'critic.json'), 'r') as json_file:
+                with open(os.path.join(self.modelPath, 'critic.json'), 'r') as json_file:
                     loaded_model_json = json_file.read()
 
                 loaded_model = model_from_json(loaded_model_json)
 
                 # load weights into new model
                 loaded_model.load_weights(os.path.join(self.modelPath, "actor.h5"))
-                c_optimizer = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
+                c_optimizer = SGD(lr=self.learningRate, decay=1e-6, momentum=0.9, nesterov=True)
                 loaded_model.compile(loss='mse',
                                      optimizer=c_optimizer,
                                      metrics=['accuracy'])

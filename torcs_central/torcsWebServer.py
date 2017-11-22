@@ -22,10 +22,15 @@ import modelHandler
 
 config=json.load(open("./torcs_central/config.json"))
 resourcePath=config['resourcePath']
+imagePath=config['imagePath']
 
 if not os.path.isdir(resourcePath):
     os.mkdir(resourcePath)
     print("Directory created at ",resourcePath)
+
+if not os.path.isdir(imagePath):
+    os.mkdir(imagePath)
+    print("Directory created at ",imagePath)
 
 global resource
 resource=[]
@@ -51,6 +56,7 @@ try:
     parameterDict.pop('pulledModels')
 except:
     print("check config.json")
+
 #-------------------- Update time -------------------------------------#
 startTime=datetime.datetime.now()
 upTime=0.0
@@ -102,7 +108,7 @@ def plotter(refreshRate=5):
             plt.xlabel('no of episodes')
             plt.ylabel('no of rewards')
             plt.title('performance')
-            plt.savefig('./torcs_central/templates/assets/images/test1.png')
+            plt.savefig(os.path.join(imagePath,'test1.png'))
 #-------------------- Handlers -------------------------------------#
 def handlerequest(request):
     cmd=request['cmd']
