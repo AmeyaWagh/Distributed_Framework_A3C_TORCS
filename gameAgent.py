@@ -32,21 +32,21 @@ class Agent(object):
         self.batchSize = batchSize
         self.config = json.load(open('./torcs_central/config.json'))
         self.t_client = torcsWebClient(configPath="./torcs_central/config.json")
-        if self.t_client.pingServer():
-            print("pulling weights")
-            self.weights = self.t_client.pullData()
-        else:
-            print("Error communicating with server")
-            raise AttributeError("Could not able to connect to Server")
+        # if self.t_client.pingServer():
+        #     print("pulling weights")
+        #     self.weights = self.t_client.pullData()
+        # else:
+        #     print("Error communicating with server")
+        #     raise AttributeError("Could not able to connect to Server")
 
-    def pushToServer(self):
-        payload = {
-                    "actor":[0,1,2,3,4],
-                    "critic":[0,1,2,3,4]
-                    }
+    def pushToServer(self,metaData):
+        # payload = {
+        #             "actor":[0,1,2,3,4],
+        #             "critic":[0,1,2,3,4]
+        #             }
         if self.t_client.pingServer(): 
-            print("pushing weights to server")           
-            self.t_client.pushData(payload)
+            print("pushing metaData to server")           
+            self.t_client.pushData(metaData)
         else:
             print("Error communicating with server")
             raise AttributeError("Could not able to connect to Server")
@@ -134,7 +134,7 @@ class Agent(object):
                 raise AttributeError("Something went wrong in loading models")    
 
 
-    def dumpModels(self):
+    def dumpModels(self,metaData={}):
         if not os.path.isdir(self.modelPath):
             os.mkdir(self.modelPath)
             print("Directory created at ",self.modelPath)
@@ -159,7 +159,7 @@ class Agent(object):
         self.critic.save_weights(os.path.join(self.modelPath,"critic.h5"))
         print("Saved Critic to disk")
 
-        self.pushToServer()
+        self.pushToServer(metaData)
         # print("weights:",self.actor.trainable_weights,type(self.actor.trainable_weights))
         # print("weights:",self.actor.trainable_weights,type(self.actor.trainable_weights))
         

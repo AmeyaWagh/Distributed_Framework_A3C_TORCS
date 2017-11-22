@@ -55,7 +55,10 @@ for i in range(episode_count):
             if done:
                 print('-'*80,'\nDone\n','-'*80)
                 # agent.pushToServer()
-                agent.dumpModels()
+                agent.dumpModels(metaData={'total_reward':total_reward,
+                                            'steps_taken':step,
+                                            'episode_done':i
+                                            })
                 break
 
         print("TOTAL REWARD @ " + str(i) +" -th Episode  :  " + str(total_reward))
@@ -65,7 +68,10 @@ for i in range(episode_count):
     except KeyboardInterrupt:
         print ("process killed by user")
         os.system('pkill torcs')
-        agent.dumpModels()
+        agent.dumpModels(metaData={'total_reward':total_reward,
+                                            'steps_taken':step,
+                                            'episode_done':i
+                                            })
         quit()
 
 env.end()  # This is for shutting down TORCS

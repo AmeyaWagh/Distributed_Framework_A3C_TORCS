@@ -7,6 +7,7 @@ import json
 import os
 import time
 import numpy as np
+import traceback
 import matplotlib.pyplot as plt
 
 config=json.load(open("./torcs_central/config.json"))
@@ -19,14 +20,12 @@ if not os.path.isdir(resourcePath):
 global resource
 resource=[]
 log=[]
-users = ['ameya','shakti','sanket']
-rewards = [15.0,20.0,35.0,5.0]
-episodes = [1,2,3,4]
+workers = []
+episode_count=0
+rewards = [0]
+episodes = [0]
 
-statusLog=['Ameya uploaded resource',
-            'Ameya uploaded resource',
-            'Ameya uploaded resource'
-            ]
+statusLog=[]
 
 parameterDict=config
 try:
@@ -49,9 +48,9 @@ def updateUpTime():
 #-------------------- Update Users or Workers -------------------------------------#
 def updateUsers():
     for log_ in log:
-        user = log_[0]
-        if user not in users:
-            users.append(user)
+        worker = log_[0]
+        if worker not in workers:
+            workers.append(worker)
 
 print("running from:",os.getcwd())
 
@@ -62,6 +61,14 @@ def limitLog(limitLog_=20,limitStatusLog=5):
     if len(statusLog)>limitStatusLog:
         statusLog.pop(0)    
 
+#-------------------- StatusHandler -------------------------------------#
+def statusHandler(metaData):
+    status_str=''
+    if metaData['cmd']=='updateResource':
+        status_str+="Worker {} Ended game".format(metaData['clientID'])
+    if metaData['cmd']=='fetchResource':
+        status_str+="Worker {} Started game".format(metaData['clientID'])
+    statusLog.append(status_str)
 #-------------------- Plotter -------------------------------------#
 global plotterStarttime
 plotterStarttime=datetime.datetime.now()
@@ -128,7 +135,19 @@ class MyHandler(tornado.web.RequestHandler):
         resource.append(data)
         try:
             log.append([data['clientID'],data['cmd'],time.ctime()])
-        except:
+            statusHandler(data)
+            try:
+                if data['data']['episode_done']>=0:
+                    episode_count+=1
+                    episodes.append(episode_count)
+                    rewards.append(data['data']['total_reward'])
+            except:
+                # traceback.print_exc(e)
+                # print("error in metaData") 
+                pass
+
+        except Exception as e:
+            traceback.print_exc(e)
             print("no clientID")
         self.write(handlerequest(data))
 
@@ -140,7 +159,7 @@ class MyHandler(tornado.web.RequestHandler):
         self.render("template.html", 
             title="TORCS_A3C", 
             items=log, 
-            users=users,
+            workers=workers,
             maxReward=max(rewards),
             maxEpisodes=max(episodes),
             upTime=updateUpTime(),
