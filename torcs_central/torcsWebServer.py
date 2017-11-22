@@ -9,6 +9,16 @@ import time
 import numpy as np
 import traceback
 import matplotlib.pyplot as plt
+import sys
+import modelHandler
+# from inspect import getsourcefile
+
+# current_path = os.path.abspath(getsourcefile(lambda:0))
+# current_dir = os.path.dirname(current_path)
+# parent_dir = current_dir[:current_dir.rfind(os.path.sep)]
+# sys.path.insert(0,parent_dir)
+
+# from networks.models import ActorModel, CriticModel
 
 config=json.load(open("./torcs_central/config.json"))
 resourcePath=config['resourcePath']
