@@ -59,3 +59,28 @@ footer {
           padding-left: 0;
           margin-left: 0;
         }
+
+/*table {
+    border-spacing: 5px;
+}
+
+table, th, td {
+    padding-left: 5px;
+    border: 1px solid lightgray;
+    border-collapse: collapse;
+}*/
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+th {
+    background-color: #dddddd;
+}

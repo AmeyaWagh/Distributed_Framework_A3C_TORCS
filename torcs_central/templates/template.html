@@ -35,8 +35,10 @@
 
 <div class="container-fluid">
   <div class="row content">
-    <div class="col-sm-3 sidenav hidden-xs " > 
+    <div class="col-sm-3 sidenav hidden-xs " >
+    <br>
       <h4>DISTRIBUTED RL FRAMEWORK</h4>
+    <hr>
       <ul class="nav nav-pills nav-stacked">
         <li class="active"><a href="#dashboard">Dashboard</a></li>
         <li><a href="#plots">Plots</a></li>
@@ -49,18 +51,21 @@
     <!-- Dashboard -->
     <!-- <section id="dashboard"> -->
     <div class="col-sm-9">
-      <div class="well">
-        <h4>DISTRIBUTED RL FRAMEWORK</h4>
-        <p>Some text..</p>
+      <div style="text-align: center;">
+      <hr>
+        <h3>DASHBOARD</h3>
+        <!-- <p>Some text..</p> -->
     </div>
+    <br>
 
       <div class="row">
         <div class="col-sm-3">
           <div class="well">
-            <h4>Users</h4>
+            <h4>Workers</h4>
+            <hr>
             <p>
               {% for user in users %}
-                <li>{{ user }}</li>
+                {{ user }} <br>
               {% end %}
             </p> 
           </div>
@@ -74,19 +79,22 @@
         <div class="col-sm-3">
           <div class="well">
             <h4>Max Reward</h4>
+            <hr>
             <p>{{ maxReward}}</p> 
           </div>
         </div>
         <div class="col-sm-3">
           <div class="well">
             <h4>Max Episodes</h4>
-            <p>30%</p> 
+            <hr>
+            <p>{{ maxEpisodes }}</p> 
           </div>
         </div>
         <div class="col-sm-3">
           <div class="well">
             <h4>Up Time</h4>
-            <p>30%</p> 
+            <hr>
+            <p>{{ upTime }}</p> 
           </div>
         </div>
       </div>
@@ -96,24 +104,45 @@
       <div class="row">
         <div class="col-sm-6">
           <div class="well">
-            <h4>Config</h4>
-            <div class="well">
-              text
-            </div> 
+            <h4>Parameters</h4>
+            <hr>
+            <table style="width:100%">
+              <tr>
+                <th>Parameter</th>
+                <th>Value</th>
+              </tr>
+              {% for key,val in testParams.iteritems() %}
+              <tr>    
+                <td> {{ key }} </td>
+                <td> {{ val }} </td>
+              </tr>
+              {% end %}
+            </table>  
           </div>
         </div>
         <div class="col-sm-6">
           <div class="well">
-            <h4>Status</h4>
-            <div class="well">
-              text
-            </div>
+            <h4>Activity</h4>
+            <hr>
+            <!-- <div class="well"> -->
+              {% for val in statusLog%}
+              {{ val }}<br>
+              {% end %}
+            <!-- </div> -->
           </div>
         </div>
       </div>
 
-      <hr></hr>
       <section id="plots">
+        
+        <div class="col-sm-12">
+          <div style="text-align: center;">
+          <hr>
+            <h3>PLOTS</h3>
+            <!-- <p>Some text..</p> -->
+        </div>
+        <br>
+
         <div class="row">
           <div class="col-sm-6">
             <div class="well">
@@ -124,8 +153,15 @@
         </div>
       </section>
 
-      <hr></hr>
       <section id="statistics">
+        <div class="col-sm-9">
+        <div style="text-align: center;">
+        <hr>
+          <h3>STATS</h3>
+          <!-- <p>Some text..</p> -->
+      </div>
+      <br>
+
         <div class="row">
           <div class="col-sm-6">
             <div class="well">
@@ -143,8 +179,16 @@
           </div>  
         </div>
       </section>
-      <hr></hr>
+
+
       <section id="logs">
+      <div class="col-sm-9">
+        <div style="text-align: center;">
+        <hr>
+          <h3>LOGS</h3>
+          <!-- <p>Some text..</p> -->
+      </div>
+      <br>  
       <div class="row">
         <div class="col-sm-12">
           <div class="well">
@@ -156,11 +200,6 @@
             </div>
           </div>
         </div>
-        <!-- <div class="col-sm-4">
-          <div class="well">
-            <p>Text</p> 
-          </div>
-        </div> -->
       </div>
     </section>
 

@@ -2,6 +2,14 @@
 	"ip":"localhost",
 	"port":9090,
 	"clientID":"ameya",
+	"algorithm":"A3C",
+	"learningRate":0.1,
+	"exploration":0.01,
 	"resourcePath":"./resource",
-	"pulledModels":"./pulledModels"
+	"pulledModels":"./pulledModels",
+	"maxEpisodes":100,
+	"maxSteps":5000,
+	"gamma":0.975,
+	"maxBuffLen":100,
+	"batchSize":50
 }

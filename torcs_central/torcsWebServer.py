@@ -5,7 +5,9 @@ import tornado.web
 import datetime
 import json
 import os
+import time
 import numpy as np
+import matplotlib.pyplot as plt
 
 config=json.load(open("./torcs_central/config.json"))
 resourcePath=config['resourcePath']
@@ -17,15 +19,62 @@ if not os.path.isdir(resourcePath):
 global resource
 resource=[]
 log=[]
-users = []
-maxReward=250
+users = ['ameya','shakti','sanket']
+rewards = [15.0,20.0,35.0,5.0]
+episodes = [1,2,3,4]
+
+statusLog=['Ameya uploaded resource',
+            'Ameya uploaded resource',
+            'Ameya uploaded resource'
+            ]
+
+parameterDict=config
+try:
+    parameterDict.pop('clientID')
+    parameterDict.pop('pulledModels')
+except:
+    print("check config.json")
+#-------------------- Update time -------------------------------------#
+startTime=datetime.datetime.now()
+upTime=0.0
+
+def updateUpTime():
+    upTime=(datetime.datetime.now()-startTime).seconds
+    mm,ss = divmod(upTime,60)
+    hh,mm = divmod(mm,60)
+    upTime = "{:02d}:{:02d}:{:02d}".format(hh,mm,ss)
+    # upTime.strftime("%M:%S")
+    return upTime
+
+#-------------------- Update Users or Workers -------------------------------------#
 def updateUsers():
     for log_ in log:
         user = log_[0]
         if user not in users:
             users.append(user)
 
-print(os.getcwd())
+print("running from:",os.getcwd())
+
+#-------------------- set limit on length of logs -------------------------------------#
+def limitLog(limitLog_=20,limitStatusLog=5):
+    if len(log)>limitLog_:
+        log.pop(0)
+    if len(statusLog)>limitStatusLog:
+        statusLog.pop(0)    
+
+#-------------------- Plotter -------------------------------------#
+global plotterStarttime
+plotterStarttime=datetime.datetime.now()
+def plotter(refreshRate=5):
+    if (datetime.datetime.now()-plotterStarttime).seconds > refreshRate:
+        global plotterStarttime
+        plotterStarttime = datetime.datetime.now()
+        plt.plot(episodes,rewards)
+        plt.xlabel('no of episodes')
+        plt.ylabel('no of rewards')
+        plt.title('performance')
+        plt.savefig('./torcs_central/templates/assets/images/test1.png')
+#-------------------- Handlers -------------------------------------#
 def handlerequest(request):
     cmd=request['cmd']
     if cmd=='ping':
@@ -78,20 +127,25 @@ class MyHandler(tornado.web.RequestHandler):
         global resource
         resource.append(data)
         try:
-            log.append([data['clientID'],data['cmd'],datetime.datetime.now().isoformat()])
+            log.append([data['clientID'],data['cmd'],time.ctime()])
         except:
             print("no clientID")
         self.write(handlerequest(data))
 
     def get(self):
-        # items = ["Item 1", "Item 2", "Item 3"]
-        # if resource is not None:
-        #     items = [[elem['clientID'],elem['cmd']] for elem in resource]
-        # else:
-        #     items = []
         updateUsers()
-        items=log
-        self.render("template.html", title="TORCS_A3C", items=items, users=users,maxReward=maxReward)    
+        updateUpTime()
+        limitLog()
+        plotter()
+        self.render("template.html", 
+            title="TORCS_A3C", 
+            items=log, 
+            users=users,
+            maxReward=max(rewards),
+            maxEpisodes=max(episodes),
+            upTime=updateUpTime(),
+            testParams=parameterDict,
+            statusLog=statusLog)    
 
 if __name__ == '__main__':
     settings = {
