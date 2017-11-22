@@ -5,4 +5,5 @@ old_models/
 resource/
 pulledModels/
 torcs_central/templates/assets/images/*.png
+temp/
 *.png

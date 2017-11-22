@@ -4,6 +4,7 @@
 	"clientID":"ameya",
 	"resourcePath":"./resource",
 	"pulledModels":"./pulledModels",
+	"tempPath":"./temp",
 	"imagePath":"./torcs_central/templates/assets/images",
 	"algorithm":"A3C",
 	"learningRate":0.1,

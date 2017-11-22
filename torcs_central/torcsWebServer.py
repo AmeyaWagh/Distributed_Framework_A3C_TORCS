@@ -11,19 +11,13 @@ import traceback
 import matplotlib.pyplot as plt
 import sys
 import modelHandler
-# from inspect import getsourcefile
-
-# current_path = os.path.abspath(getsourcefile(lambda:0))
-# current_dir = os.path.dirname(current_path)
-# parent_dir = current_dir[:current_dir.rfind(os.path.sep)]
-# sys.path.insert(0,parent_dir)
-
-# from networks.models import ActorModel, CriticModel
 
 config=json.load(open("./torcs_central/config.json"))
 resourcePath=config['resourcePath']
 imagePath=config['imagePath']
+tempPath=config['tempPath']
 
+#---------------create necessary directories-----------------------------#
 if not os.path.isdir(resourcePath):
     os.mkdir(resourcePath)
     print("Directory created at ",resourcePath)
@@ -31,6 +25,16 @@ if not os.path.isdir(resourcePath):
 if not os.path.isdir(imagePath):
     os.mkdir(imagePath)
     print("Directory created at ",imagePath)
+
+if not os.path.isdir(tempPath):
+    os.mkdir(tempPath)
+    print("Directory created at ",tempPath)    
+
+#---------------Start browser session-----------------------------#
+try:
+    os.system("sensible-browser http://localhost:{} &".format(config['port']))
+except Exception as e:
+    print("Could not open browser")
 
 global resource
 resource=[]
@@ -148,9 +152,9 @@ class Upload(tornado.web.RequestHandler):
         print(self.request.files['critic'][0].keys())
         actor_body = self.request.files['actor'][0]['body']
         critic_body = self.request.files['critic'][0]['body']
-        with open(os.path.join(resourcePath,'actor.h5'),'wb') as fp:
+        with open(os.path.join(tempPath,'actor.h5'),'wb') as fp:
             fp.write(actor_body)
-        with open(os.path.join(resourcePath,'critic.h5'),'wb') as fp:
+        with open(os.path.join(tempPath,'critic.h5'),'wb') as fp:
             fp.write(critic_body)
         self.write(json.dumps({"response":"update_success","status":0}))    
         
