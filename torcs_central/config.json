@@ -1,0 +1,7 @@
+{
+	"ip":"localhost",
+	"port":9090,
+	"clientID":"ameya",
+	"resourcePath":"./resource",
+	"pulledModels":"./pulledModels"
+}

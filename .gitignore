@@ -1,2 +1,6 @@
 *.pdf
 __pycache__/
+models/
+old_models/
+resource/
+pulledModels/
