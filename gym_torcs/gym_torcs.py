@@ -14,7 +14,7 @@ import time
 class TorcsEnv:
     terminal_judge_start = 500  # Speed limit is applied after this step
     termination_limit_progress = 5  # [km/h], episode terminates if car is running slower than this limit
-    default_speed = 40
+    default_speed = 30
 
     initial_reset = True
 
@@ -116,7 +116,7 @@ class TorcsEnv:
         else:
             #  Automatic Gear Change by Snakeoil is possible
             action_torcs['gear'] = 1
-            """
+            
             if client.S.d['speedX'] > 50:
                 action_torcs['gear'] = 2
             if client.S.d['speedX'] > 80:
@@ -127,7 +127,7 @@ class TorcsEnv:
                 action_torcs['gear'] = 5
             if client.S.d['speedX'] > 170:
                 action_torcs['gear'] = 6
-            """
+            
 
         # Save the privious full-obs from torcs for the reward calculation
         obs_pre = copy.deepcopy(client.S.d)

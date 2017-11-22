@@ -5,6 +5,21 @@ import tornado.web
 import datetime
 import json
 import os
+import time
+import numpy as np
+import traceback
+import matplotlib.pyplot as plt
+import sys
+import modelHandler
+# from inspect import getsourcefile
+
+# current_path = os.path.abspath(getsourcefile(lambda:0))
+# current_dir = os.path.dirname(current_path)
+# parent_dir = current_dir[:current_dir.rfind(os.path.sep)]
+# sys.path.insert(0,parent_dir)
+
+# from networks.models import ActorModel, CriticModel
+
 config=json.load(open("./torcs_central/config.json"))
 resourcePath=config['resourcePath']
 
@@ -14,8 +29,81 @@ if not os.path.isdir(resourcePath):
 
 global resource
 resource=[]
+
 log=[]
 
+workers = []
+global episode_count
+episode_count=0
+
+global rewards
+rewards = []
+
+global episodes
+episodes = []
+
+statusLog=[]
+
+parameterDict=config
+
+try:
+    parameterDict.pop('clientID')
+    parameterDict.pop('pulledModels')
+except:
+    print("check config.json")
+#-------------------- Update time -------------------------------------#
+startTime=datetime.datetime.now()
+upTime=0.0
+
+def updateUpTime():
+    upTime=(datetime.datetime.now()-startTime).seconds
+    mm,ss = divmod(upTime,60)
+    hh,mm = divmod(mm,60)
+    upTime = "{:02d}:{:02d}:{:02d}".format(hh,mm,ss)
+    # upTime.strftime("%M:%S")
+    return upTime
+
+#-------------------- Update Users or Workers -------------------------------------#
+def updateUsers():
+    for log_ in log:
+        worker = log_[0]
+        if worker not in workers:
+            workers.append(worker)
+
+print("running from:",os.getcwd())
+
+#-------------------- set limit on length of logs -------------------------------------#
+def limitLog(limitLog_=50,limitStatusLog=20):
+    if len(log)>limitLog_:
+        log.pop(0)
+    if len(statusLog)>limitStatusLog:
+        statusLog.pop(0)    
+
+#-------------------- StatusHandler -------------------------------------#
+def statusHandler(metaData):
+    status_str=''
+    if metaData['cmd']=='updateResource':
+        status_str+="Worker {} Ended game at {}".format(metaData['clientID'],updateUpTime())
+        statusLog.append(status_str)
+    elif metaData['cmd']=='fetchResource':
+        status_str+="Worker {} Started game at {}".format(metaData['clientID'],updateUpTime())
+        statusLog.append(status_str)
+    else:
+        pass
+#-------------------- Plotter -------------------------------------#
+global plotterStarttime
+plotterStarttime=datetime.datetime.now()
+def plotter(refreshRate=5):
+    if (datetime.datetime.now()-plotterStarttime).seconds > refreshRate:
+        global plotterStarttime
+        plotterStarttime = datetime.datetime.now()
+        if len(episodes)>0 and len(rewards)>0:
+            plt.plot(episodes,rewards)
+            plt.xlabel('no of episodes')
+            plt.ylabel('no of rewards')
+            plt.title('performance')
+            plt.savefig('./torcs_central/templates/assets/images/test1.png')
+#-------------------- Handlers -------------------------------------#
 def handlerequest(request):
     cmd=request['cmd']
     if cmd=='ping':
@@ -68,25 +156,49 @@ class MyHandler(tornado.web.RequestHandler):
         global resource
         resource.append(data)
         try:
-            log.append([data['clientID'],data['cmd'],datetime.datetime.now().isoformat()])
-        except:
+            log.append([data['clientID'],data['cmd'],time.ctime()])
+            statusHandler(data)
+            try:
+                if ('episode_done' in data['data'].keys()) and ('total_reward' in data['data'].keys()):
+                    global episode_count
+                    episode_count+=1
+                    episodes.append(episode_count)
+                    rewards.append(data['data']['total_reward'])
+            except Exception as e:
+                traceback.print_exc(e)
+                print("error in metaData") 
+                pass
+
+        except Exception as e:
+            traceback.print_exc(e)
             print("no clientID")
         self.write(handlerequest(data))
 
     def get(self):
-        # items = ["Item 1", "Item 2", "Item 3"]
-        # if resource is not None:
-        #     items = [[elem['clientID'],elem['cmd']] for elem in resource]
-        # else:
-        #     items = []
-        items=log
-        self.render("index.html", title="TORCS_A3C", items=items)    
+        updateUsers()
+        updateUpTime()
+        limitLog()
+        plotter()
+        self.render("template.html", 
+            title="TORCS_A3C", 
+            items=log, 
+            workers=workers,
+            maxReward=[max(rewards) if len(rewards)>0 else 0 for r in range(1)],
+            maxEpisodes=[max(episodes) if len(episodes)>0 else 0 for ep in range(1)],
+            upTime=updateUpTime(),
+            testParams=parameterDict,
+            statusLog=statusLog)    
 
 if __name__ == '__main__':
+    settings = {
+        "debug": True,
+        "template_path": os.path.join(os.getcwd(),"torcs_central","templates"),
+        "static_path": os.path.join(os.getcwd(),"torcs_central","templates")
+        }
     app = tornado.web.Application([ 
         tornado.web.url(r'/', MyHandler),
         tornado.web.url(r'/upload', Upload) ,
-        tornado.web.url(r'/download/(.*)', Download) ])
+        tornado.web.url(r'/download/(.*)', Download) ],**settings)
     http_server = tornado.httpserver.HTTPServer(app)
     http_server.listen(9090)
     print('Starting server on port 9090')

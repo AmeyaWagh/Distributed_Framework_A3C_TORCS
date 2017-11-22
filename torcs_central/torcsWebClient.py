@@ -16,7 +16,7 @@ class torcsWebClient():
     def pushData(self,Data):
         jsonData={"cmd":"updateResource",
                     "clientID":self.clientID}
-        # jsonData.update({"data":Data})
+        jsonData.update({"data":Data})
         files = {"actor":open('./models/actor.h5','rb'),"critic":open('./models/critic.h5','rb')}
         r = requests.post(self.url+'upload', files=files)
         r = requests.post(self.url, json=jsonData)
@@ -51,7 +51,7 @@ class torcsWebClient():
         return r.json()['data']
 
     def pingServer(self):
-        jsonData = {"cmd":"ping","clientID":self.clientID}  
+        jsonData = {"cmd":"ping","clientID":self.clientID,"data":{}}  
         r = requests.post(self.url, json=jsonData)
         print(r.json())
         if r.json()['status']==0:
