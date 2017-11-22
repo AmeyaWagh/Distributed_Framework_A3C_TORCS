@@ -27,10 +27,10 @@ global episode_count
 episode_count=0
 
 global rewards
-rewards = [0]
+rewards = []
 
 global episodes
-episodes = [0]
+episodes = []
 
 statusLog=[]
 
@@ -73,10 +73,10 @@ def limitLog(limitLog_=50,limitStatusLog=20):
 def statusHandler(metaData):
     status_str=''
     if metaData['cmd']=='updateResource':
-        status_str+="Worker {} Ended game".format(metaData['clientID'])
+        status_str+="Worker {} Ended game at {}".format(metaData['clientID'],updateUpTime())
         statusLog.append(status_str)
     elif metaData['cmd']=='fetchResource':
-        status_str+="Worker {} Started game".format(metaData['clientID'])
+        status_str+="Worker {} Started game at {}".format(metaData['clientID'],updateUpTime())
         statusLog.append(status_str)
     else:
         pass
@@ -87,11 +87,12 @@ def plotter(refreshRate=5):
     if (datetime.datetime.now()-plotterStarttime).seconds > refreshRate:
         global plotterStarttime
         plotterStarttime = datetime.datetime.now()
-        plt.plot(episodes,rewards)
-        plt.xlabel('no of episodes')
-        plt.ylabel('no of rewards')
-        plt.title('performance')
-        plt.savefig('./torcs_central/templates/assets/images/test1.png')
+        if len(episodes)>0 and len(rewards)>0:
+            plt.plot(episodes,rewards)
+            plt.xlabel('no of episodes')
+            plt.ylabel('no of rewards')
+            plt.title('performance')
+            plt.savefig('./torcs_central/templates/assets/images/test1.png')
 #-------------------- Handlers -------------------------------------#
 def handlerequest(request):
     cmd=request['cmd']
@@ -172,8 +173,8 @@ class MyHandler(tornado.web.RequestHandler):
             title="TORCS_A3C", 
             items=log, 
             workers=workers,
-            maxReward=max(rewards),
-            maxEpisodes=max(episodes),
+            maxReward=[max(rewards) if len(rewards)>0 else 0 for r in range(1)],
+            maxEpisodes=[max(episodes) if len(episodes)>0 else 0 for ep in range(1)],
             upTime=updateUpTime(),
             testParams=parameterDict,
             statusLog=statusLog)    
