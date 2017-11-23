@@ -10,13 +10,14 @@ import numpy as np
 import traceback
 import matplotlib.pyplot as plt
 import sys
-import modelHandler
+import modelHandler 
 
 config=json.load(open("./torcs_central/config.json"))
 resourcePath=config['resourcePath']
 imagePath=config['imagePath']
 tempPath=config['tempPath']
 
+centralModel = modelHandler.CentralModel()
 #---------------create necessary directories-----------------------------#
 if not os.path.isdir(resourcePath):
     os.mkdir(resourcePath)
@@ -156,7 +157,8 @@ class Upload(tornado.web.RequestHandler):
             fp.write(actor_body)
         with open(os.path.join(tempPath,'critic.h5'),'wb') as fp:
             fp.write(critic_body)
-        self.write(json.dumps({"response":"update_success","status":0}))    
+        self.write(json.dumps({"response":"update_success","status":0}))
+        centralModel.updateWeights()    
         
 
 class MyHandler(tornado.web.RequestHandler):
