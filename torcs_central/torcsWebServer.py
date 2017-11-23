@@ -135,7 +135,7 @@ class Download(tornado.web.RequestHandler):
                     fileData = fp.read()
                 self.write(fileData)
             elif filename=='critic':
-                with open(os.path.join(resourcePath,'actor.h5'),'rb') as fp:
+                with open(os.path.join(resourcePath,'critic.h5'),'rb') as fp:
                     fileData = fp.read()
                 self.write(fileData)
             else:
