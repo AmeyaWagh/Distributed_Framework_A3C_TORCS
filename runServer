@@ -1,0 +1,4 @@
+#! /bin/bash
+echo "Starting Server"
+python3 ./torcs_central/torcsWebServer.py
+pkill python
