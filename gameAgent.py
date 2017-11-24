@@ -29,6 +29,7 @@ class Agent(object):
         self.ACTION_SPACE = 1
         self.config = json.load(open('./torcs_central/config.json'))
         self.learningRate = self.config['learningRate']
+        self.epochs = self.config['epochs']
         self.loadModel()  
         # self.actor = ActorModel(3,1).actor
         # self.critic = CriticModel(3).critic
@@ -239,7 +240,7 @@ class Agent(object):
             y_train=np.array(y_train)
             # print('X_train shape',np.shape(X_train))
             print('train Critic')
-            self.critic.fit(X_train,y_train,batch_size=self.batchSize,epochs=1,verbose=1)
+            self.critic.fit(X_train,y_train,batch_size=self.batchSize,epochs=self.epochs,verbose=1)
 
         if len(self.ReplayBuffActor) > self.maxBuffLen:
             self.ReplayBuffActor.pop(0)
@@ -256,7 +257,7 @@ class Agent(object):
             X_train = np.array(X_train)
             y_train = np.array(y_train)
             print('train Actor')
-            self.actor.fit(X_train, y_train, batch_size=self.batchSize, epochs=1, verbose=1)
+            self.actor.fit(X_train, y_train, batch_size=self.batchSize, epochs=self.epochs, verbose=1)
 
 
         # steerAngle = np.tanh(20*observation[0]) #observation[0] is angle

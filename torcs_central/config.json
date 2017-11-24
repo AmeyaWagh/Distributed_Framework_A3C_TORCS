@@ -14,5 +14,6 @@
 	"gamma":0.975,
 	"maxBuffLen":100,
 	"batchSize":50,
-	"tau":0.001
+	"epochs":1,
+	"tau":0.1
 }
