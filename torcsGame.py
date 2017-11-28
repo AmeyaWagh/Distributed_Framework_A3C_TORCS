@@ -27,6 +27,7 @@ for i in range(episode_count):
     try:
         print("Episode : " + str(i))
 
+        agent.pullFromServer()
         if np.mod(i, 3) == 0:
             # Sometimes you need to relaunch TORCS because of the memory leak error
             ob = env.reset(relaunch=True)
@@ -37,14 +38,13 @@ for i in range(episode_count):
         total_reward = 0.
         # prev_ob = ob
         action=np.array([random.uniform(0,1)])
-        agent.pullFromServer()
         for j in range(max_steps):
             # os.system('clear')
             ob, reward, done, _ = env.step(action)
             if (random.random()<epsilon):
                 print('-'*40,"Random Exploration",'-'*40)
-                # action=np.array([random.uniform(-1,1)])
-                action=np.array([random.randint(-1,1)])
+                action=np.array([random.uniform(-1,1)])
+                # action=np.array([random.randint(-1,1)])
             else:
                 op = agent.act(env, ob, reward, done, vision)
                 action = op[0]

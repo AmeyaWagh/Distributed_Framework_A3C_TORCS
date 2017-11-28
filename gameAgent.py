@@ -59,7 +59,7 @@ class Agent(object):
             if self.t_client.pingServer(): 
                 print("pulling weights from server")           
                 self.weights = self.t_client.pullData()
-                print(self.weights)
+                # print(self.weights)
             else:
                 print("Error communicating with server")
                 raise AttributeError("Could not connect to Server")
@@ -240,7 +240,7 @@ class Agent(object):
             y_train=np.array(y_train)
             # print('X_train shape',np.shape(X_train))
             print('train Critic')
-            self.critic.fit(X_train,y_train,batch_size=self.batchSize,epochs=self.epochs,verbose=1)
+            self.critic.fit(X_train,y_train,batch_size=self.batchSize,epochs=self.epochs,verbose=0)
 
         if len(self.ReplayBuffActor) > self.maxBuffLen:
             self.ReplayBuffActor.pop(0)
@@ -257,7 +257,7 @@ class Agent(object):
             X_train = np.array(X_train)
             y_train = np.array(y_train)
             print('train Actor')
-            self.actor.fit(X_train, y_train, batch_size=self.batchSize, epochs=self.epochs, verbose=1)
+            self.actor.fit(X_train, y_train, batch_size=self.batchSize, epochs=self.epochs, verbose=0)
 
 
         # steerAngle = np.tanh(20*observation[0]) #observation[0] is angle
