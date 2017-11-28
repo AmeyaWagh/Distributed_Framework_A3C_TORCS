@@ -45,8 +45,11 @@ class CentralModel():
 
     def updateWeights(self):
         try:
-            self.target_actor.load_weights(os.path.join(tempPath, "actor.h5"))
-            self.target_critic.load_weights(os.path.join(tempPath, "critic.h5"))
+            # Loads weights in the worker model
+            self.worker_actor.load_weights(os.path.join(tempPath, "actor.h5"))
+            self.worker_critic.load_weights(os.path.join(tempPath, "critic.h5"))
+
+            # compile worker model
             self.worker_actor.compile(loss='mse',
                              optimizer=self.c_optimizer,
                              metrics=['accuracy'])
@@ -54,12 +57,15 @@ class CentralModel():
                              optimizer=self.c_optimizer,
                              metrics=['accuracy'])
             
+            # load target weights
             self.target_actor_weights = self.target_actor.get_weights()
             self.target_critic_weighs = self.target_critic.get_weights()
 
+            # load worker weights
             self.worker_actor_weights = self.worker_actor.get_weights()
             self.worker_critic_weights = self.worker_critic.get_weights()
 
+            # update weights
             for i in range(len(self.target_actor_weights)):
                 self.target_actor_weights[i] = self.tau * self.worker_actor_weights[i] + (1 - self.tau)* self.target_actor_weights[i]
             self.target_actor.set_weights(self.target_actor_weights)
@@ -68,6 +74,7 @@ class CentralModel():
                 self.target_critic_weighs[i] = self.tau * self.worker_critic_weights[i] + (1 - self.tau)* self.target_critic_weighs[i]
             self.target_critic.set_weights(self.target_critic_weighs)
 
+            # save weights
             self.target_actor.save_weights(os.path.join(resourcePath, "actor.h5"))
             self.target_critic.save_weights(os.path.join(resourcePath, "critic.h5"))
             print("model weighs updated")

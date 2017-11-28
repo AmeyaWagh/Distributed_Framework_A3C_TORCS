@@ -28,6 +28,7 @@ for i in range(episode_count):
         print("Episode : " + str(i))
 
         agent.pullFromServer()
+        time.sleep(1)
         if np.mod(i, 3) == 0:
             # Sometimes you need to relaunch TORCS because of the memory leak error
             ob = env.reset(relaunch=True)
@@ -61,6 +62,7 @@ for i in range(episode_count):
                                             'steps_taken':step,
                                             'episode_done':i
                                             })
+                time.sleep(1)
                 break
 
         print("TOTAL REWARD @ " + str(i) +" -th Episode  :  " + str(total_reward))

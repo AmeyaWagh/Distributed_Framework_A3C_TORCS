@@ -8,7 +8,7 @@
 	"imagePath":"./torcs_central/templates/assets/images",
 	"algorithm":"A3C",
 	"learningRate":0.01,
-	"exploration":0.1,
+	"exploration":0.2,
 	"maxEpisodes":100,
 	"maxSteps":5000,
 	"gamma":0.975,
