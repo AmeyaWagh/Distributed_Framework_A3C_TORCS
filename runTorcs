@@ -36,40 +36,13 @@ Default:
         or on the same machine.    
 "
 
-while getopts "h?cnse:" opt; do
-    case "$opt" in
-    h|\?)
-        echo "$usage"
-        exit 0
-        ;;
-    c)  python3 torcsGame.py
-        pkill torcs
-        exit 0
-        ;;
-    n)  rm -rf models/ pulledModels/ resource/ temp/
-        ;;
-    s)  ./runServer
-        exit 0
-        ;;
-    e)  nano "$config_file"
-        exit 0
-        ;;     
-    esac
-done
-
-shift $((OPTIND-1))
-
-[ "$1" = "--" ] && shift
-
-# echo " Leftovers: $@"
-
 killallprocess(){
     echo "-----------------killing all processes------------------------"
     stopflag=1
     kill -INT $TASK_PID
     pkill torcs
     kill -INT $SERVER_PID
-    pkill python3
+    # pkill python3
     exit 0
 }
 trap killallprocess INT
@@ -89,6 +62,36 @@ while true;do
     fi
 done;   
 }
+
+while getopts "h?cnse:" opt; do
+    case "$opt" in
+    h|\?)
+        echo "$usage"
+        exit 0
+        ;;
+    c)  runWorker
+        # python3 torcsGame.py
+        # pkill torcs
+        exit 0
+        ;;
+    n)  rm -rf models/ pulledModels/ resource/ temp/
+        ;;
+    s)  ./runServer
+        exit 0
+        ;;
+    e)  nano "$config_file"
+        exit 0
+        ;;     
+    esac
+done
+
+shift $((OPTIND-1))
+
+[ "$1" = "--" ] && shift
+
+# echo " Leftovers: $@"
+
+
 
 
 ./runServer &

@@ -16,7 +16,7 @@ done = False
 step = 0
 
 # Generate a Torcs environment
-env = TorcsEnv(vision=vision, throttle=False ,textMode=True,xmlPath='./gym_torcs/practice.xml')
+env = TorcsEnv(vision=vision, throttle=False ,default_speed=config['default_speed'] ,textMode=True,xmlPath='./gym_torcs/practice.xml')
 
 agent = Agent(1,verbose=True)  # steering only
 
@@ -38,13 +38,16 @@ for i in range(episode_count):
 
         total_reward = 0.
         # prev_ob = ob
-        action=np.array([random.uniform(0,1)])
+        # action=np.array([random.uniform(0,1)])
+        action=np.array([np.random.normal(0,1)])
+
         for j in range(max_steps):
             # os.system('clear')
             ob, reward, done, _ = env.step(action)
             if (random.random()<epsilon):
                 print('-'*40,"Random Exploration",'-'*40)
-                action=np.array([random.uniform(-1,1)])
+                # action=np.array([random.uniform(-1,1)])
+                action=np.array([np.random.normal(0,0.25)])
                 # action=np.array([random.randint(-1,1)])
             else:
                 op = agent.act(env, ob, reward, done, vision)

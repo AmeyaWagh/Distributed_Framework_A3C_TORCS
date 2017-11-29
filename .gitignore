@@ -7,3 +7,4 @@ pulledModels/
 torcs_central/templates/assets/images/*.png
 temp/
 *.png
+serverDump/

@@ -7,13 +7,15 @@
 	"tempPath":"./temp",
 	"imagePath":"./torcs_central/templates/assets/images",
 	"algorithm":"A3C",
-	"learningRate":0.01,
-	"exploration":0.2,
+	"learningRate":0.05,
+	"exploration":0.1,
 	"maxEpisodes":100,
 	"maxSteps":5000,
 	"gamma":0.975,
 	"maxBuffLen":100,
 	"batchSize":50,
 	"epochs":1,
-	"tau":0.1
+	"tau":0.2,
+	"actionScale":50,
+	"default_speed":25
 }

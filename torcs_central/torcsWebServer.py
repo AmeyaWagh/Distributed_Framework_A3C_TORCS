@@ -54,6 +54,19 @@ episodes = []
 
 statusLog=[]
 
+try:
+    if os.path.exists(os.path.join('serverDump','dump.json')):
+        print("Server restored to previous state")
+        dumpJson = json.load(open(os.path.join('serverDump','dump.json')))
+        workers = dumpJson['workers']
+        rewards = dumpJson['rewards']
+        episodes = dumpJson['episodes']
+        statusLog = dumpJson['statusLog']
+        episode_count = dumpJson['episode_count']
+        log = dumpJson['log']
+except:
+    print("could not load serverDump")
+
 parameterDict=config
 
 try:
@@ -114,6 +127,21 @@ def plotter(refreshRate=5):
             plt.ylabel('no of rewards')
             plt.title('performance')
             plt.savefig(os.path.join(imagePath,'test1.png'))
+
+#-------------------- Plotter -------------------------------------#
+def cleanup():
+    if not os.path.isdir('serverDump'):
+        os.mkdir('serverDump')
+    dumpJson = {
+    "workers":workers,
+    "rewards":rewards,
+    "episodes":episodes,
+    "episode_count":episode_count,
+    "statusLog":statusLog,
+    "log":log
+    }
+    json.dump(dumpJson,open(os.path.join('serverDump','dump.json'),'w'))    
+
 #-------------------- Handlers -------------------------------------#
 def handlerequest(request):
     cmd=request['cmd']
@@ -202,16 +230,23 @@ class MyHandler(tornado.web.RequestHandler):
             statusLog=statusLog)    
 
 if __name__ == '__main__':
-    settings = {
-        "debug": True,
-        "template_path": os.path.join(os.getcwd(),"torcs_central","templates"),
-        "static_path": os.path.join(os.getcwd(),"torcs_central","templates")
-        }
-    app = tornado.web.Application([ 
-        tornado.web.url(r'/', MyHandler),
-        tornado.web.url(r'/upload', Upload) ,
-        tornado.web.url(r'/download/(.*)', Download) ],**settings)
-    http_server = tornado.httpserver.HTTPServer(app)
-    http_server.listen(9090)
-    print('Starting server on port 9090')
-    tornado.ioloop.IOLoop.instance().start()
+    try:
+        settings = {
+            "debug": True,
+            "template_path": os.path.join(os.getcwd(),"torcs_central","templates"),
+            "static_path": os.path.join(os.getcwd(),"torcs_central","templates")
+            }
+        app = tornado.web.Application([ 
+            tornado.web.url(r'/', MyHandler),
+            tornado.web.url(r'/upload', Upload) ,
+            tornado.web.url(r'/download/(.*)', Download) ],**settings)
+        http_server = tornado.httpserver.HTTPServer(app)
+        http_server.listen(9090)
+        print('Starting server on port 9090')
+        tornado.ioloop.IOLoop.instance().start()
+    except Exception as e:
+        print("There was some problem")
+    finally:
+        cleanup()
+        print("Server was killed")
+        

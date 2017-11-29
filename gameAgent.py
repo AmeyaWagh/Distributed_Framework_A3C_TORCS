@@ -30,6 +30,7 @@ class Agent(object):
         self.config = json.load(open('./torcs_central/config.json'))
         self.learningRate = self.config['learningRate']
         self.epochs = self.config['epochs']
+        self.actionScale = self.config['actionScale']
         self.loadModel()  
         # self.actor = ActorModel(3,1).actor
         # self.critic = CriticModel(3).critic
@@ -262,7 +263,7 @@ class Agent(object):
 
         # steerAngle = np.tanh(20*observation[0]) #observation[0] is angle
         # steerAngle = 50*action[0][0]
-        steerAngle = action[0][0]
+        steerAngle = self.actionScale*action[0][0]
         
         steerAngle = np.array([steerAngle])
         print('steerAngle',steerAngle)

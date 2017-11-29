@@ -19,8 +19,10 @@ class TorcsEnv:
     initial_reset = True
 
 
-    def __init__(self, vision=False, throttle=False, gear_change=False,textMode=False,xmlPath='practice.xml'):
+    def __init__(self, vision=False, throttle=False, gear_change=False,default_speed=None,textMode=False,xmlPath='practice.xml'):
        #print("Init")
+        if default_speed is not None:
+            self.default_speed = default_speed
         self.vision = vision
         self.throttle = throttle
         self.gear_change = gear_change
