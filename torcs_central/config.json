@@ -1,7 +1,8 @@
 {
-	"ip":"localhost",
+
+	"ip":"192.168.0.106",
 	"port":9090,
-	"clientID":"ameya",
+	"clientID":"Sanket",
 	"algorithm":"A3C",
 	"learningRate":0.1,
 	"exploration":0.01,
@@ -12,4 +13,5 @@
 	"gamma":0.975,
 	"maxBuffLen":100,
 	"batchSize":50
+
 }
