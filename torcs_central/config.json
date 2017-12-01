@@ -8,7 +8,7 @@
 	"tempPath":"./temp",
 	"imagePath":"./torcs_central/templates/assets/images",
 	"tensorboard":true,
-	"supervised":true,
+	"supervised":false,
 	"algorithm":"A3C",
 	"learningRate":0.1,
 	"exploration":0.1,

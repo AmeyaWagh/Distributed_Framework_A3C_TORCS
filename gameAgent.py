@@ -91,6 +91,21 @@ class Agent(object):
         except Exception as e:
             # traceback.print_exc(e)
             print("Could not pull from server")
+            try:
+                if os.path.isdir(self.modelPath):
+                    self.actor.load_weights(os.path.join(self.modelPath, "actor.h5"))
+                    a_optimizer = SGD(lr=self.learningRate, decay=1e-6, momentum=0.9, nesterov=True)
+                    self.actor.compile(loss='mse',
+                                         optimizer=a_optimizer,
+                                         metrics=['accuracy'])
+                    self.critic.load_weights(os.path.join(self.modelPath, "critic.h5"))
+                    a_optimizer = SGD(lr=self.learningRate, decay=1e-6, momentum=0.9, nesterov=True)
+                    self.critic.compile(loss='mse',
+                                         optimizer=a_optimizer,
+                                         metrics=['accuracy'])
+                    print("loaded model from {}".format(self.modelPath))
+            except Exception as e:
+                print("failed to load from models")
 
 
     def loadModel(self):
