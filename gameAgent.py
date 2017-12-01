@@ -292,7 +292,7 @@ class Agent(object):
         if (random.random()<self.epsilon):
             print('-'*40,"Random Exploration",'-'*40)
             # action=np.array([random.uniform(-1,1)])
-            steerAngle=np.array([np.random.normal(0,0.25)])
+            steerAngle=np.random.normal(0,0.25)
         else:
             # steerAngle = np.tanh(20*observation[0]) #observation[0] is angle
             # steerAngle = 50*action[0][0]
