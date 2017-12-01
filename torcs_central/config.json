@@ -6,6 +6,7 @@
 	"pulledModels":"./pulledModels",
 	"tempPath":"./temp",
 	"imagePath":"./torcs_central/templates/assets/images",
+	"tensorboard":true,
 	"algorithm":"A3C",
 	"learningRate":0.001,
 	"exploration":0.2,

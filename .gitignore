@@ -11,4 +11,4 @@ serverDump/
 gym_torcs/.idea/
 gym_torcs/__init__.py
 gym_torcs/vtorcs-RL-color/export/
-
+logs/

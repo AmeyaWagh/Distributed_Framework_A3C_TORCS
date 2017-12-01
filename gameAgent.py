@@ -12,6 +12,8 @@ from torcs_central.torcsWebClient import torcsWebClient
 from keras.utils import plot_model
 import json
 import traceback
+from keras.callbacks import TensorBoard
+
 config=json.load(open("./torcs_central/config.json"))
 
 class Agent(object):
@@ -31,7 +33,14 @@ class Agent(object):
         self.learningRate = self.config['learningRate']
         self.epochs = self.config['epochs']
         self.actionScale = self.config['actionScale']
-        self.loadModel()  
+        self.TensorBoard_Flag = self.config['tensorboard']
+        self.loadModel()
+        if self.TensorBoard_Flag:
+            if not os.path.isdir('logs'):
+                os.mkdir('./logs')
+            self.tensorboard_actor_callback = TensorBoard(log_dir='logs/actor')  
+            self.tensorboard_critic_callback = TensorBoard(log_dir='logs/critic')
+
         # self.actor = ActorModel(3,1).actor
         # self.critic = CriticModel(3).critic
         self.gamma = gamma
@@ -241,7 +250,17 @@ class Agent(object):
             y_train=np.array(y_train)
             # print('X_train shape',np.shape(X_train))
             print('train Critic')
-            self.critic.fit(X_train,y_train,batch_size=self.batchSize,epochs=self.epochs,verbose=0)
+            if self.TensorBoard_Flag:
+                self.critic.fit(X_train,y_train,
+                    batch_size=self.batchSize,
+                    epochs=self.epochs,
+                    verbose=0,
+                    callbacks=[self.tensorboard_critic_callback])
+            else:
+                self.critic.fit(X_train,y_train,
+                    batch_size=self.batchSize,
+                    epochs=self.epochs,
+                    verbose=0)
 
         if len(self.ReplayBuffActor) > self.maxBuffLen:
             self.ReplayBuffActor.pop(0)
@@ -258,7 +277,18 @@ class Agent(object):
             X_train = np.array(X_train)
             y_train = np.array(y_train)
             print('train Actor')
-            self.actor.fit(X_train, y_train, batch_size=self.batchSize, epochs=self.epochs, verbose=0)
+            if self.TensorBoard_Flag:
+                self.actor.fit(X_train, y_train, 
+                    batch_size=self.batchSize, 
+                    epochs=self.epochs, 
+                    verbose=0,
+                    callbacks=[self.tensorboard_actor_callback])
+            else:
+                self.actor.fit(X_train, y_train, 
+                    batch_size=self.batchSize, 
+                    epochs=self.epochs, 
+                    verbose=0)
+
 
 
         # steerAngle = np.tanh(20*observation[0]) #observation[0] is angle

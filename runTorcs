@@ -19,11 +19,12 @@ Distributed RL framework for Torcs
 usage ./runTorcs [Arguments]
 
 Arguments:
-    -h              show this help text
-    -s              server only
-    -c              worker only
-    -n              erase models and start new session
-    -e config       edit config file
+    -h               show this help text
+    -s               server only
+    -c               worker only
+    -n               erase models and start new session
+    -e               edit config file
+    -t [/log_path]   run tensorboard
 
 Default:
     -   Both server and client would run on the same computer
@@ -66,7 +67,7 @@ while true;do
 done;   
 }
 
-while getopts "h?cnse:" opt; do
+while getopts "h?cnset:" opt; do
     case "$opt" in
     h|\?)
         echo "$usage"
@@ -84,7 +85,12 @@ while getopts "h?cnse:" opt; do
         ;;
     e)  nano "$config_file"
         exit 0
-        ;;     
+        ;;
+    t)  echo "tensorboard"
+        sensible-browser http://localhost:6006 &
+        tensorboard --logdir=${OPTARG}
+        exit 0
+        ;;         
     esac
 done
 
