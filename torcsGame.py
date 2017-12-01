@@ -44,14 +44,16 @@ for i in range(episode_count):
         for j in range(max_steps):
             # os.system('clear')
             ob, reward, done, _ = env.step(action)
-            if (random.random()<epsilon):
-                print('-'*40,"Random Exploration",'-'*40)
-                # action=np.array([random.uniform(-1,1)])
-                action=np.array([np.random.normal(0,0.25)])
-                # action=np.array([random.randint(-1,1)])
-            else:
-                op = agent.act(env, ob, reward, done, vision)
-                action = op[0]
+
+            # if (random.random()<epsilon):
+            #     print('-'*40,"Random Exploration",'-'*40)
+            #     # action=np.array([random.uniform(-1,1)])
+            #     action=np.array([np.random.normal(0,0.25)])
+            #     # action=np.array([random.randint(-1,1)])
+            # else:
+            #     op = agent.act(env, ob, reward, done, vision)
+            #     action = op[0]
+            action = agent.act(env, ob, reward, done, vision)[0]  
             # new_ob = op[1]
             #print(ob)
             total_reward += reward

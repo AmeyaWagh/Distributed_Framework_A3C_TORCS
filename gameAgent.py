@@ -13,6 +13,7 @@ from keras.utils import plot_model
 import json
 import traceback
 from keras.callbacks import TensorBoard
+import random
 
 config=json.load(open("./torcs_central/config.json"))
 
@@ -33,6 +34,7 @@ class Agent(object):
         self.learningRate = self.config['learningRate']
         self.epochs = self.config['epochs']
         self.actionScale = self.config['actionScale']
+        self.epsilon=config['exploration']
         self.TensorBoard_Flag = self.config['tensorboard']
         self.loadModel()
         if self.TensorBoard_Flag:
@@ -186,15 +188,12 @@ class Agent(object):
 
 
     def debugger(self, *args, **kwargs):
-        # for arg in args:
         if self.verbose is True:
             print(args)
 
 
     def act(self,env,ob,reward, done, vision_on):
         
-        # os.system('clear')
-
         observation,vect_dim = self.preProcess.getVector(ob,vision_on)
 
         # [r,c] = vect_dim
@@ -290,10 +289,14 @@ class Agent(object):
                     verbose=0)
 
 
-
-        # steerAngle = np.tanh(20*observation[0]) #observation[0] is angle
-        # steerAngle = 50*action[0][0]
-        steerAngle = self.actionScale*action[0][0]
+        if (random.random()<self.epsilon):
+            print('-'*40,"Random Exploration",'-'*40)
+            # action=np.array([random.uniform(-1,1)])
+            steerAngle=np.array([np.random.normal(0,0.25)])
+        else:
+            # steerAngle = np.tanh(20*observation[0]) #observation[0] is angle
+            # steerAngle = 50*action[0][0]
+            steerAngle = self.actionScale*action[0][0]
         
         steerAngle = np.array([steerAngle])
         print('steerAngle',steerAngle)

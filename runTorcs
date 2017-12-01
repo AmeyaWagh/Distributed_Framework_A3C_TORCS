@@ -40,13 +40,15 @@ Default:
 killallprocess(){
     echo "\n\n\n\n-----------------killing all processes------------------------"
     echo " WORKER_PID $TASK_PID"
-    echo "\n\n\n\n--------------------------------------------------------------"
     # echo " SERVER_PID $SERVER_PID"
     stopflag=1
     kill -INT $TASK_PID
+    echo " KILLED $TASK_PID"
     pkill torcs
+    echo " torcs $TASK_PID"
     # kill -INT $SERVER_PID
     # pkill python3
+    echo "\n\n\n\n--------------------------------------------------------------"
     exit 0
 }
 trap killallprocess INT
@@ -57,7 +59,9 @@ while true;do
     echo "-----------------------------------starting worker-----------------------------------"
     python3 torcsGame.py &
     TASK_PID=$!
+    echo "\n\n\n\n--------------------------------------------------------------"
     echo " WORKER_PID $TASK_PID"
+    echo "\n\n\n\n--------------------------------------------------------------"
     sleep 5m
     kill -INT $TASK_PID
     pkill torcs
