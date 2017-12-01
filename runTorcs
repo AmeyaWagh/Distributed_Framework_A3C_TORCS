@@ -91,14 +91,11 @@ shift $((OPTIND-1))
 
 # echo " Leftovers: $@"
 
-
-
-
-./runServer &
-SERVER_PID=$!
-echo "SERVER_PID $SERVER_PID"
-sleep 10
-runWorker
-# pkill python3
-echo "KILLED WORKER"
-exit 0
+# ./runServer &
+# SERVER_PID=$!
+# echo "SERVER_PID $SERVER_PID"
+# sleep 10
+# runWorker
+# # pkill python3
+# echo "KILLED WORKER"
+# exit 0

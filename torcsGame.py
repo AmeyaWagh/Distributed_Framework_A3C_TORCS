@@ -81,5 +81,14 @@ for i in range(episode_count):
                                             })
         quit()
 
+    # finally:
+    #     print ("process killed by system")
+    #     os.system('pkill torcs')
+    #     agent.dumpModels(metaData={'total_reward':total_reward,
+    #                                         'steps_taken':step,
+    #                                         'episode_done':i
+    #                                         })
+    #     quit()
+
 env.end()  # This is for shutting down TORCS
 print("Finish.")
