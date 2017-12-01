@@ -11,7 +11,7 @@
 	"supervised":true,
 	"algorithm":"A3C",
 	"learningRate":0.1,
-	"exploration":0.1,
+	"exploration":0.01,
 	"maxEpisodes":100,
 	"maxSteps":5000,
 	"gamma":0.975,
@@ -20,5 +20,5 @@
 	"epochs":1,
 	"tau":0.1,
 	"actionScale":10,
-	"default_speed":25
+	"default_speed":50
 }

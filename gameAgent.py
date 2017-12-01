@@ -296,7 +296,8 @@ class Agent(object):
             steerAngle=np.random.normal(0,0.25)
         else:
             if self.supervised_Flag:
-                steerAngle = np.tanh(20*observation[0]) #observation[0] is angle
+                steerAngle = np.tanh(5*observation[0]) #observation[0] is angle
+                # steerAngle = observation[0] #observation[0] is angle
             else:
                 steerAngle = self.actionScale*action[0][0]
         

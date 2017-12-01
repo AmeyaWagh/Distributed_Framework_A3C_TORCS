@@ -264,7 +264,8 @@ class TorcsEnv:
                      'rpm',
                      'track',
                      'wheelSpinVel',
-                     'angle']
+                     'angle',
+                     'trackPos']
             Observation = col.namedtuple('Observaion', names)
             return Observation(focus=np.array(raw_obs['focus'], dtype=np.float32)/200.,
                                speedX=np.array(raw_obs['speedX'], dtype=np.float32)/self.default_speed,
@@ -274,7 +275,8 @@ class TorcsEnv:
                                rpm=np.array(raw_obs['rpm'], dtype=np.float32),
                                track=np.array(raw_obs['track'], dtype=np.float32)/200.,
                                wheelSpinVel=np.array(raw_obs['wheelSpinVel'], dtype=np.float32),
-                               angle=np.array(raw_obs['angle'], dtype=np.float32),)
+                               angle=np.array(raw_obs['angle'], dtype=np.float32),
+                               trackPos=np.array(raw_obs['trackPos'], dtype=np.float32),)
         else:
             names = ['focus',
                      'speedX', 'speedY', 'speedZ',
@@ -282,6 +284,8 @@ class TorcsEnv:
                      'rpm',
                      'track',
                      'wheelSpinVel',
+                     'angle',
+                     'trackPos',
                      'img']
             Observation = col.namedtuple('Observaion', names)
 
@@ -296,4 +300,6 @@ class TorcsEnv:
                                rpm=np.array(raw_obs['rpm'], dtype=np.float32),
                                track=np.array(raw_obs['track'], dtype=np.float32)/200.,
                                wheelSpinVel=np.array(raw_obs['wheelSpinVel'], dtype=np.float32),
+                               angle=np.array(raw_obs['angle'], dtype=np.float32),
+                               trackPos=np.array(raw_obs['trackPos'], dtype=np.float32),
                                img=image_rgb)
