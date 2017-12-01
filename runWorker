@@ -1,0 +1,5 @@
+#! /bin/bash
+echo "Starting Worker"
+python3 torcsGame.py
+pkill torcs
+

@@ -36,6 +36,7 @@ class Agent(object):
         self.actionScale = self.config['actionScale']
         self.epsilon=config['exploration']
         self.TensorBoard_Flag = self.config['tensorboard']
+        self.supervised_Flag = self.config['supervised']
         self.loadModel()
         if self.TensorBoard_Flag:
             if not os.path.isdir('logs'):
@@ -294,9 +295,10 @@ class Agent(object):
             # action=np.array([random.uniform(-1,1)])
             steerAngle=np.random.normal(0,0.25)
         else:
-            # steerAngle = np.tanh(20*observation[0]) #observation[0] is angle
-            # steerAngle = 50*action[0][0]
-            steerAngle = self.actionScale*action[0][0]
+            if self.supervised_Flag:
+                steerAngle = np.tanh(20*observation[0]) #observation[0] is angle
+            else:
+                steerAngle = self.actionScale*action[0][0]
         
         steerAngle = np.array([steerAngle])
         print('steerAngle',steerAngle)

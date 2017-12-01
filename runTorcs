@@ -54,7 +54,7 @@ killallprocess(){
 trap killallprocess INT
 
 # running Torcs for long time causes memory leak or lags. kill the worker and start again
-runWorker(){
+runWorker_loop(){
 while true;do
     echo "-----------------------------------starting worker-----------------------------------"
     python3 torcsGame.py &
@@ -64,6 +64,7 @@ while true;do
     echo "\n\n\n\n--------------------------------------------------------------"
     sleep 5m
     kill -INT $TASK_PID
+    pkill python3
     pkill torcs
     if [ "$stopflag" -ne 0 ]; then
         break
@@ -77,9 +78,8 @@ while getopts "h?cnset:" opt; do
         echo "$usage"
         exit 0
         ;;
-    c)  runWorker
-        # python3 torcsGame.py
-        # pkill torcs
+    c)  ./runWorker
+        #runWorker
         exit 0
         ;;
     n)  rm -rf models/ pulledModels/ resource/ temp/
