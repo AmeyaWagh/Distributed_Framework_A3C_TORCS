@@ -11,10 +11,15 @@ import os
 from torcs_central.torcsWebClient import torcsWebClient
 from keras.utils import plot_model
 import json
+import traceback
+from keras.callbacks import TensorBoard
+import random
+
+config=json.load(open("./torcs_central/config.json"))
 
 class Agent(object):
 
-    def __init__(self, dim_action, verbose=False,gamma=0.975,maxBuffLen=100,batchSize=50):
+    def __init__(self, dim_action, verbose=False,gamma=config['gamma'],maxBuffLen=config['maxBuffLen'],batchSize=config['batchSize']):
         self.dim_action = dim_action
         self.verbose = verbose
         self.preProcess = preProcess()
@@ -25,12 +30,24 @@ class Agent(object):
         self.plotterPath = './plots'
         self.OBSERVATION_SPACE = 1
         self.ACTION_SPACE = 1
-        self.loadModel()  
+        self.config = json.load(open('./torcs_central/config.json'))
+        self.learningRate = self.config['learningRate']
+        self.epochs = self.config['epochs']
+        self.actionScale = self.config['actionScale']
+        self.epsilon=config['exploration']
+        self.TensorBoard_Flag = self.config['tensorboard']
+        self.supervised_Flag = self.config['supervised']
+        self.loadModel()
+        if self.TensorBoard_Flag:
+            if not os.path.isdir('logs'):
+                os.mkdir('./logs')
+            self.tensorboard_actor_callback = TensorBoard(log_dir='logs/actor')  
+            self.tensorboard_critic_callback = TensorBoard(log_dir='logs/critic')
+
         # self.actor = ActorModel(3,1).actor
         # self.critic = CriticModel(3).critic
         self.gamma = gamma
         self.batchSize = batchSize
-        self.config = json.load(open('./torcs_central/config.json'))
         self.t_client = torcsWebClient(configPath="./torcs_central/config.json")
         # if self.t_client.pingServer():
         #     print("pulling weights")
@@ -40,37 +57,55 @@ class Agent(object):
         #     raise AttributeError("Could not able to connect to Server")
 
     def pushToServer(self,metaData):
-        # payload = {
-        #             "actor":[0,1,2,3,4],
-        #             "critic":[0,1,2,3,4]
-        #             }
-        if self.t_client.pingServer(): 
-            print("pushing metaData to server")           
-            self.t_client.pushData(metaData)
-        else:
-            print("Error communicating with server")
-            raise AttributeError("Could not able to connect to Server")
+        try:
+            if self.t_client.pingServer(): 
+                print("pushing metaData to server")           
+                self.t_client.pushData(metaData)
+            else:
+                print("Error communicating with server")
+                raise AttributeError("Could not able to connect to Server")
+        except Exception as e:
+            print("Could not push to server")        
 
     def pullFromServer(self):
-        if self.t_client.pingServer(): 
-            print("pulling weights from server")           
-            self.weights = self.t_client.pullData()
-            print(self.weights)
-        else:
-            print("Error communicating with server")
-            raise AttributeError("Could not able to connect to Server")
-            
-        if os.path.isdir(self.config['pulledModels']):
-            self.actor.load_weights(os.path.join(self.config['pulledModels'], "actor.h5"))
-            a_optimizer = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
-            self.actor.compile(loss='mse',
-                                 optimizer=a_optimizer,
-                                 metrics=['accuracy'])
-            self.critic.load_weights(os.path.join(self.config['pulledModels'], "critic.h5"))
-            a_optimizer = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
-            self.critic.compile(loss='mse',
-                                 optimizer=a_optimizer,
-                                 metrics=['accuracy'])
+        try:
+            if self.t_client.pingServer(): 
+                print("pulling weights from server")           
+                self.weights = self.t_client.pullData()
+                # print(self.weights)
+            else:
+                print("Error communicating with server")
+                raise AttributeError("Could not connect to Server")
+                
+            if os.path.isdir(self.config['pulledModels']):
+                self.actor.load_weights(os.path.join(self.config['pulledModels'], "actor.h5"))
+                a_optimizer = SGD(lr=self.learningRate, decay=1e-6, momentum=0.9, nesterov=True)
+                self.actor.compile(loss='mse',
+                                     optimizer=a_optimizer,
+                                     metrics=['accuracy'])
+                self.critic.load_weights(os.path.join(self.config['pulledModels'], "critic.h5"))
+                a_optimizer = SGD(lr=self.learningRate, decay=1e-6, momentum=0.9, nesterov=True)
+                self.critic.compile(loss='mse',
+                                     optimizer=a_optimizer,
+                                     metrics=['accuracy'])
+        except Exception as e:
+            # traceback.print_exc(e)
+            print("Could not pull from server")
+            try:
+                if os.path.isdir(self.modelPath):
+                    self.actor.load_weights(os.path.join(self.modelPath, "actor.h5"))
+                    a_optimizer = SGD(lr=self.learningRate, decay=1e-6, momentum=0.9, nesterov=True)
+                    self.actor.compile(loss='mse',
+                                         optimizer=a_optimizer,
+                                         metrics=['accuracy'])
+                    self.critic.load_weights(os.path.join(self.modelPath, "critic.h5"))
+                    a_optimizer = SGD(lr=self.learningRate, decay=1e-6, momentum=0.9, nesterov=True)
+                    self.critic.compile(loss='mse',
+                                         optimizer=a_optimizer,
+                                         metrics=['accuracy'])
+                    print("loaded model from {}".format(self.modelPath))
+            except Exception as e:
+                print("failed to load from models")
 
 
     def loadModel(self):
@@ -82,15 +117,14 @@ class Agent(object):
 
         if os.path.isdir(self.modelPath):
             if os.path.exists(os.path.join(self.modelPath,'actor.json')) and os.path.exists(os.path.join(self.modelPath,'actor.h5')):
-                with open(
-                        os.path.join(self.modelPath, 'actor.json'), 'r') as json_file:
+                with open(os.path.join(self.modelPath, 'actor.json'), 'r') as json_file:
                     loaded_model_json = json_file.read()
 
                 loaded_model = model_from_json(loaded_model_json)
 
                 # load weights into new model
                 loaded_model.load_weights(os.path.join(self.modelPath, "actor.h5"))
-                a_optimizer = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
+                a_optimizer = SGD(lr=self.learningRate, decay=1e-6, momentum=0.9, nesterov=True)
                 loaded_model.compile(loss='mse',
                                      optimizer=a_optimizer,
                                      metrics=['accuracy'])
@@ -103,15 +137,14 @@ class Agent(object):
                     
 
             if os.path.exists(os.path.join(self.modelPath,'critic.json')) and os.path.exists(os.path.join(self.modelPath,'critic.h5')):
-                with open(
-                        os.path.join(self.modelPath, 'critic.json'), 'r') as json_file:
+                with open(os.path.join(self.modelPath, 'critic.json'), 'r') as json_file:
                     loaded_model_json = json_file.read()
 
                 loaded_model = model_from_json(loaded_model_json)
 
                 # load weights into new model
                 loaded_model.load_weights(os.path.join(self.modelPath, "actor.h5"))
-                c_optimizer = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
+                c_optimizer = SGD(lr=self.learningRate, decay=1e-6, momentum=0.9, nesterov=True)
                 loaded_model.compile(loss='mse',
                                      optimizer=c_optimizer,
                                      metrics=['accuracy'])
@@ -171,15 +204,12 @@ class Agent(object):
 
 
     def debugger(self, *args, **kwargs):
-        # for arg in args:
         if self.verbose is True:
             print(args)
 
 
     def act(self,env,ob,reward, done, vision_on):
         
-        # os.system('clear')
-
         observation,vect_dim = self.preProcess.getVector(ob,vision_on)
 
         # [r,c] = vect_dim
@@ -235,7 +265,17 @@ class Agent(object):
             y_train=np.array(y_train)
             # print('X_train shape',np.shape(X_train))
             print('train Critic')
-            self.critic.fit(X_train,y_train,batch_size=self.batchSize,epochs=1,verbose=1)
+            if self.TensorBoard_Flag:
+                self.critic.fit(X_train,y_train,
+                    batch_size=self.batchSize,
+                    epochs=self.epochs,
+                    verbose=0,
+                    callbacks=[self.tensorboard_critic_callback])
+            else:
+                self.critic.fit(X_train,y_train,
+                    batch_size=self.batchSize,
+                    epochs=self.epochs,
+                    verbose=0)
 
         if len(self.ReplayBuffActor) > self.maxBuffLen:
             self.ReplayBuffActor.pop(0)
@@ -252,11 +292,29 @@ class Agent(object):
             X_train = np.array(X_train)
             y_train = np.array(y_train)
             print('train Actor')
-            self.actor.fit(X_train, y_train, batch_size=self.batchSize, epochs=1, verbose=1)
+            if self.TensorBoard_Flag:
+                self.actor.fit(X_train, y_train, 
+                    batch_size=self.batchSize, 
+                    epochs=self.epochs, 
+                    verbose=0,
+                    callbacks=[self.tensorboard_actor_callback])
+            else:
+                self.actor.fit(X_train, y_train, 
+                    batch_size=self.batchSize, 
+                    epochs=self.epochs, 
+                    verbose=0)
 
 
-        # steerAngle = np.tanh(20*observation[0]) #observation[0] is angle
-        steerAngle = 50*action[0][0]
+        if (random.random()<self.epsilon):
+            print('-'*40,"Random Exploration",'-'*40)
+            # action=np.array([random.uniform(-1,1)])
+            steerAngle=np.random.normal(0,0.25)
+        else:
+            if self.supervised_Flag:
+                steerAngle = np.tanh(5*observation[0]) #observation[0] is angle
+                # steerAngle = observation[0] #observation[0] is angle
+            else:
+                steerAngle = self.actionScale*action[0][0]
         
         steerAngle = np.array([steerAngle])
         print('steerAngle',steerAngle)

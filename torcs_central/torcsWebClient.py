@@ -20,7 +20,7 @@ class torcsWebClient():
         files = {"actor":open('./models/actor.h5','rb'),"critic":open('./models/critic.h5','rb')}
         r = requests.post(self.url+'upload', files=files)
         r = requests.post(self.url, json=jsonData)
-        print(r.json())
+        r.json()
 
     def pullData(self):
         jsonData={"cmd":"fetchResource",
@@ -47,7 +47,7 @@ class torcsWebClient():
  
         
         r = requests.post(self.url, json=jsonData)
-        print(r.json())
+        # r.json()
         return r.json()['data']
 
     def pingServer(self):

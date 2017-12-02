@@ -10,22 +10,32 @@ import numpy as np
 import traceback
 import matplotlib.pyplot as plt
 import sys
-import modelHandler
-# from inspect import getsourcefile
-
-# current_path = os.path.abspath(getsourcefile(lambda:0))
-# current_dir = os.path.dirname(current_path)
-# parent_dir = current_dir[:current_dir.rfind(os.path.sep)]
-# sys.path.insert(0,parent_dir)
-
-# from networks.models import ActorModel, CriticModel
+import modelHandler 
 
 config=json.load(open("./torcs_central/config.json"))
 resourcePath=config['resourcePath']
+imagePath=config['imagePath']
+tempPath=config['tempPath']
 
+centralModel = modelHandler.CentralModel()
+#---------------create necessary directories-----------------------------#
 if not os.path.isdir(resourcePath):
     os.mkdir(resourcePath)
     print("Directory created at ",resourcePath)
+
+if not os.path.isdir(imagePath):
+    os.mkdir(imagePath)
+    print("Directory created at ",imagePath)
+
+if not os.path.isdir(tempPath):
+    os.mkdir(tempPath)
+    print("Directory created at ",tempPath)    
+
+#---------------Start browser session-----------------------------#
+try:
+    os.system("sensible-browser http://localhost:{} &".format(config['port']))
+except Exception as e:
+    print("Could not open browser")
 
 global resource
 resource=[]
@@ -44,6 +54,19 @@ episodes = []
 
 statusLog=[]
 
+try:
+    if os.path.exists(os.path.join('serverDump','dump.json')):
+        print("Server restored to previous state")
+        dumpJson = json.load(open(os.path.join('serverDump','dump.json')))
+        workers = dumpJson['workers']
+        rewards = dumpJson['rewards']
+        episodes = dumpJson['episodes']
+        statusLog = dumpJson['statusLog']
+        episode_count = dumpJson['episode_count']
+        log = dumpJson['log']
+except:
+    print("could not load serverDump")
+
 parameterDict=config
 
 try:
@@ -51,6 +74,7 @@ try:
     parameterDict.pop('pulledModels')
 except:
     print("check config.json")
+
 #-------------------- Update time -------------------------------------#
 startTime=datetime.datetime.now()
 upTime=0.0
@@ -102,7 +126,22 @@ def plotter(refreshRate=5):
             plt.xlabel('no of episodes')
             plt.ylabel('no of rewards')
             plt.title('performance')
-            plt.savefig('./torcs_central/templates/assets/images/test1.png')
+            plt.savefig(os.path.join(imagePath,'test1.png'))
+
+#-------------------- Plotter -------------------------------------#
+def cleanup():
+    if not os.path.isdir('serverDump'):
+        os.mkdir('serverDump')
+    dumpJson = {
+    "workers":workers,
+    "rewards":rewards,
+    "episodes":episodes,
+    "episode_count":episode_count,
+    "statusLog":statusLog,
+    "log":log
+    }
+    json.dump(dumpJson,open(os.path.join('serverDump','dump.json'),'w'))    
+
 #-------------------- Handlers -------------------------------------#
 def handlerequest(request):
     cmd=request['cmd']
@@ -124,7 +163,7 @@ class Download(tornado.web.RequestHandler):
                     fileData = fp.read()
                 self.write(fileData)
             elif filename=='critic':
-                with open(os.path.join(resourcePath,'actor.h5'),'rb') as fp:
+                with open(os.path.join(resourcePath,'critic.h5'),'rb') as fp:
                     fileData = fp.read()
                 self.write(fileData)
             else:
@@ -142,11 +181,12 @@ class Upload(tornado.web.RequestHandler):
         print(self.request.files['critic'][0].keys())
         actor_body = self.request.files['actor'][0]['body']
         critic_body = self.request.files['critic'][0]['body']
-        with open(os.path.join(resourcePath,'actor.h5'),'wb') as fp:
+        with open(os.path.join(tempPath,'actor.h5'),'wb') as fp:
             fp.write(actor_body)
-        with open(os.path.join(resourcePath,'critic.h5'),'wb') as fp:
+        with open(os.path.join(tempPath,'critic.h5'),'wb') as fp:
             fp.write(critic_body)
-        self.write(json.dumps({"response":"update_success","status":0}))    
+        self.write(json.dumps({"response":"update_success","status":0}))
+        centralModel.updateWeights()    
         
 
 class MyHandler(tornado.web.RequestHandler):
@@ -190,16 +230,23 @@ class MyHandler(tornado.web.RequestHandler):
             statusLog=statusLog)    
 
 if __name__ == '__main__':
-    settings = {
-        "debug": True,
-        "template_path": os.path.join(os.getcwd(),"torcs_central","templates"),
-        "static_path": os.path.join(os.getcwd(),"torcs_central","templates")
-        }
-    app = tornado.web.Application([ 
-        tornado.web.url(r'/', MyHandler),
-        tornado.web.url(r'/upload', Upload) ,
-        tornado.web.url(r'/download/(.*)', Download) ],**settings)
-    http_server = tornado.httpserver.HTTPServer(app)
-    http_server.listen(9090)
-    print('Starting server on port 9090')
-    tornado.ioloop.IOLoop.instance().start()
+    try:
+        settings = {
+            "debug": True,
+            "template_path": os.path.join(os.getcwd(),"torcs_central","templates"),
+            "static_path": os.path.join(os.getcwd(),"torcs_central","templates")
+            }
+        app = tornado.web.Application([ 
+            tornado.web.url(r'/', MyHandler),
+            tornado.web.url(r'/upload', Upload) ,
+            tornado.web.url(r'/download/(.*)', Download) ],**settings)
+        http_server = tornado.httpserver.HTTPServer(app)
+        http_server.listen(9090)
+        print('Starting server on port 9090')
+        tornado.ioloop.IOLoop.instance().start()
+    except Exception as e:
+        print("There was some problem")
+    finally:
+        cleanup()
+        print("Server was killed")
+        
