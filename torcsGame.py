@@ -6,6 +6,7 @@ import os
 import time
 import random
 import json
+# import math
 config=json.load(open("./torcs_central/config.json"))
 
 vision = False
@@ -46,6 +47,7 @@ for i in range(episode_count):
         for j in range(max_steps):
             ob, reward, done, _ = env.step(action)
 
+            reward = ob.speedX*np.cos(ob.angle)-np.abs(ob.speedX*np.sin(ob.angle))-ob.speedX*np.abs(ob.trackPos)
             action = agent.act(env, ob, reward, done, vision)[0]  
 
             total_reward += reward
