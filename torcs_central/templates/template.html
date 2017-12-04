@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <!-- <link rel="stylesheet" href="./assets/css/main.css"> -->
   <link rel="stylesheet" type="text/css" href="{{ static_url("assets/css/main.css") }}">
+  <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Torcs-title.png/300px-Torcs-title.png">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
@@ -36,6 +37,9 @@
 <div class="container-fluid">
   <div class="row content">
     <div class="col-sm-3 sidenav hidden-xs " >
+      <div style="padding-top: 20px">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Torcs-title.png/300px-Torcs-title.png" class="img-thumbnail" height="100%" width="100%">            
+      </div>
     <br>
       <h4>DISTRIBUTED RL FRAMEWORK</h4>
     <hr>
@@ -80,14 +84,14 @@
           <div class="well">
             <h4>Max Reward</h4>
             <hr>
-            <p>{{ maxReward}}</p> 
+            <p>{{ maxReward[0] }}</p> 
           </div>
         </div>
         <div class="col-sm-3">
           <div class="well">
-            <h4>Max Episodes</h4>
+            <h4>Episodes elapsed</h4>
             <hr>
-            <p>{{ maxEpisodes }}</p> 
+            <p>{{ maxEpisodes[0] }}</p> 
           </div>
         </div>
         <div class="col-sm-3">
