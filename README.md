@@ -3,4 +3,4 @@ A distributed framework using HTTP server-workers for asynchronously training A3
 
 [![IMAGE ALT TEXT HERE](resources/frame219.png)](https://drive.google.com/open?id=10RYonSNVH6DV6kZ-_DiN4o7iJK-2LZ-S)
 
-Complete README coming soon
+Project still in development. Complete README coming soon
