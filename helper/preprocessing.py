@@ -15,11 +15,11 @@ class preProcess():
         self.featureVect = []
         if vision_on is False:
             focus, speedX, speedY, speedZ, opponents, rpm,\
-                track, wheelSpinVel, angle = observation
+                track, wheelSpinVel, angle, trackPos = observation
             # input_vector=[focus,speedX,speedY,speedZ,opponents,rpm,track,wheelSpinVel]
         else:
             focus, speedX, speedY, speedZ, opponents, rpm, \
-                track, wheelSpinVel, angle ,vision = observation
+                track, wheelSpinVel, angle, trackPos ,vision = observation
         #     observation['vision']=vision    
 
         # observation['focus']=focus
@@ -36,7 +36,8 @@ class preProcess():
         convert everything from -1 to 1
         '''
         # angle -pi<a<pi
-        self.featureVect.append(angle/np.pi)
+        # self.featureVect.append(angle/np.pi)
+        self.featureVect.append((angle/np.pi)-(trackPos*0.1))
         # self.featureVect.append(rpm/self.maxRpm)
         # self.featureVect.append(speedX/self.maxSpeed)
 

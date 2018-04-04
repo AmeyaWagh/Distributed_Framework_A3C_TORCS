@@ -7,3 +7,8 @@ pulledModels/
 torcs_central/templates/assets/images/*.png
 temp/
 *.png
+serverDump/
+gym_torcs/.idea/
+gym_torcs/__init__.py
+gym_torcs/vtorcs-RL-color/export/
+logs/

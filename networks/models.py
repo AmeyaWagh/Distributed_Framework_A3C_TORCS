@@ -4,6 +4,7 @@ from keras.layers.core import Dense, Dropout, Activation
 from keras.optimizers import RMSprop, SGD
 
 
+
 HIDDEN_LAYER1=164
 HIDDEN_LAYER2=150
 

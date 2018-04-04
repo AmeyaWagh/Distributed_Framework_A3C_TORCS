@@ -12,6 +12,9 @@ from torcs_central.torcsWebClient import torcsWebClient
 from keras.utils import plot_model
 import json
 import traceback
+from keras.callbacks import TensorBoard
+import random
+
 config=json.load(open("./torcs_central/config.json"))
 
 class Agent(object):
@@ -29,7 +32,18 @@ class Agent(object):
         self.ACTION_SPACE = 1
         self.config = json.load(open('./torcs_central/config.json'))
         self.learningRate = self.config['learningRate']
-        self.loadModel()  
+        self.epochs = self.config['epochs']
+        self.actionScale = self.config['actionScale']
+        self.epsilon=config['exploration']
+        self.TensorBoard_Flag = self.config['tensorboard']
+        self.supervised_Flag = self.config['supervised']
+        self.loadModel()
+        if self.TensorBoard_Flag:
+            if not os.path.isdir('logs'):
+                os.mkdir('./logs')
+            self.tensorboard_actor_callback = TensorBoard(log_dir='logs/actor')  
+            self.tensorboard_critic_callback = TensorBoard(log_dir='logs/critic')
+
         # self.actor = ActorModel(3,1).actor
         # self.critic = CriticModel(3).critic
         self.gamma = gamma
@@ -58,7 +72,7 @@ class Agent(object):
             if self.t_client.pingServer(): 
                 print("pulling weights from server")           
                 self.weights = self.t_client.pullData()
-                print(self.weights)
+                # print(self.weights)
             else:
                 print("Error communicating with server")
                 raise AttributeError("Could not connect to Server")
@@ -77,6 +91,21 @@ class Agent(object):
         except Exception as e:
             # traceback.print_exc(e)
             print("Could not pull from server")
+            try:
+                if os.path.isdir(self.modelPath):
+                    self.actor.load_weights(os.path.join(self.modelPath, "actor.h5"))
+                    a_optimizer = SGD(lr=self.learningRate, decay=1e-6, momentum=0.9, nesterov=True)
+                    self.actor.compile(loss='mse',
+                                         optimizer=a_optimizer,
+                                         metrics=['accuracy'])
+                    self.critic.load_weights(os.path.join(self.modelPath, "critic.h5"))
+                    a_optimizer = SGD(lr=self.learningRate, decay=1e-6, momentum=0.9, nesterov=True)
+                    self.critic.compile(loss='mse',
+                                         optimizer=a_optimizer,
+                                         metrics=['accuracy'])
+                    print("loaded model from {}".format(self.modelPath))
+            except Exception as e:
+                print("failed to load from models")
 
 
     def loadModel(self):
@@ -175,15 +204,12 @@ class Agent(object):
 
 
     def debugger(self, *args, **kwargs):
-        # for arg in args:
         if self.verbose is True:
             print(args)
 
 
     def act(self,env,ob,reward, done, vision_on):
         
-        # os.system('clear')
-
         observation,vect_dim = self.preProcess.getVector(ob,vision_on)
 
         # [r,c] = vect_dim
@@ -239,7 +265,17 @@ class Agent(object):
             y_train=np.array(y_train)
             # print('X_train shape',np.shape(X_train))
             print('train Critic')
-            self.critic.fit(X_train,y_train,batch_size=self.batchSize,epochs=1,verbose=1)
+            if self.TensorBoard_Flag:
+                self.critic.fit(X_train,y_train,
+                    batch_size=self.batchSize,
+                    epochs=self.epochs,
+                    verbose=0,
+                    callbacks=[self.tensorboard_critic_callback])
+            else:
+                self.critic.fit(X_train,y_train,
+                    batch_size=self.batchSize,
+                    epochs=self.epochs,
+                    verbose=0)
 
         if len(self.ReplayBuffActor) > self.maxBuffLen:
             self.ReplayBuffActor.pop(0)
@@ -256,11 +292,29 @@ class Agent(object):
             X_train = np.array(X_train)
             y_train = np.array(y_train)
             print('train Actor')
-            self.actor.fit(X_train, y_train, batch_size=self.batchSize, epochs=1, verbose=1)
+            if self.TensorBoard_Flag:
+                self.actor.fit(X_train, y_train, 
+                    batch_size=self.batchSize, 
+                    epochs=self.epochs, 
+                    verbose=0,
+                    callbacks=[self.tensorboard_actor_callback])
+            else:
+                self.actor.fit(X_train, y_train, 
+                    batch_size=self.batchSize, 
+                    epochs=self.epochs, 
+                    verbose=0)
 
 
-        # steerAngle = np.tanh(20*observation[0]) #observation[0] is angle
-        steerAngle = 50*action[0][0]
+        if (random.random()<self.epsilon):
+            print('-'*40,"Random Exploration",'-'*40)
+            # action=np.array([random.uniform(-1,1)])
+            steerAngle=np.random.normal(0,0.25)
+        else:
+            if self.supervised_Flag:
+                steerAngle = np.tanh(5*observation[0]) #observation[0] is angle
+                # steerAngle = observation[0] #observation[0] is angle
+            else:
+                steerAngle = self.actionScale*action[0][0]
         
         steerAngle = np.array([steerAngle])
         print('steerAngle',steerAngle)

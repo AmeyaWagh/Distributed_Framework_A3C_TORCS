@@ -1,18 +1,24 @@
+
 {
-	"ip":"localhost",
+	"ip":"192.168.0.107",
 	"port":9090,
 	"clientID":"ameya",
 	"resourcePath":"./resource",
 	"pulledModels":"./pulledModels",
 	"tempPath":"./temp",
 	"imagePath":"./torcs_central/templates/assets/images",
+	"tensorboard":true,
+	"supervised":false,
 	"algorithm":"A3C",
 	"learningRate":0.1,
-	"exploration":0.001,
+	"exploration":0.1,
 	"maxEpisodes":100,
 	"maxSteps":5000,
 	"gamma":0.975,
 	"maxBuffLen":100,
 	"batchSize":50,
-	"tau":0.001
+	"epochs":1,
+	"tau":0.1,
+	"actionScale":10,
+	"default_speed":30
 }
