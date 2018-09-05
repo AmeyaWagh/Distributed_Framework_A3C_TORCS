@@ -1,4 +1,4 @@
-# Distributed_Framework_A3C_TORCS
+# Distributed Framework for A3C using TORCS environment 
 A distributed framework using HTTP server-workers for asynchronously training A3C agent to play TORCS
 
 <div style="text-align:center;">
